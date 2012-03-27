@@ -9,16 +9,16 @@
     <Node UniqueName="[0-1029]BundleTransformer.Tests" Expanded="true" />
     <Node UniqueName="[0-1030]BundleTransformer.Tests.Core" Expanded="true" />
     <Node UniqueName="[0-1033]BundleTransformer.Tests.Core.Assets" Expanded="true" />
-    <Node UniqueName="[0-1005]BundleTransformer.Tests.Core.Assets.AssetTests" Expanded="true" />
+    <Node UniqueName="[0-1013]BundleTransformer.Tests.Core.Assets.AssetTests" Expanded="true" />
     <Node UniqueName="[0-1031]BundleTransformer.Tests.Core.Filters" Expanded="true" />
-    <Node UniqueName="[0-1000]BundleTransformer.Tests.Core.Filters.CssDuplicateAssetsFilterTests" Expanded="true" />
-    <Node UniqueName="[0-1014]BundleTransformer.Tests.Core.Filters.CssFileExtensionsFilterTests" Expanded="true" />
-    <Node UniqueName="[0-1019]BundleTransformer.Tests.Core.Filters.CssUnnecessaryAssetsFilterTests" Expanded="true" />
-    <Node UniqueName="[0-1017]BundleTransformer.Tests.Core.Filters.JsDuplicateAssetsFilterTests" Expanded="true" />
-    <Node UniqueName="[0-1011]BundleTransformer.Tests.Core.Filters.JsFileExtensionsFilterTests" Expanded="true" />
-    <Node UniqueName="[0-1023]BundleTransformer.Tests.Core.Filters.JsUnnecessaryAssetsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1004]BundleTransformer.Tests.Core.Filters.CssDuplicateAssetsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1022]BundleTransformer.Tests.Core.Filters.CssFileExtensionsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1000]BundleTransformer.Tests.Core.Filters.CssUnnecessaryAssetsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1025]BundleTransformer.Tests.Core.Filters.JsDuplicateAssetsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1019]BundleTransformer.Tests.Core.Filters.JsFileExtensionsFilterTests" Expanded="true" />
+    <Node UniqueName="[0-1006]BundleTransformer.Tests.Core.Filters.JsUnnecessaryAssetsFilterTests" Expanded="true" />
     <Node UniqueName="[0-1032]BundleTransformer.Tests.Core.Validators" Expanded="true" />
-    <Node UniqueName="[0-1008]BundleTransformer.Tests.Core.Validators.CssAssetTypesValidatorTests" Expanded="true" />
-    <Node UniqueName="[0-1002]BundleTransformer.Tests.Core.Validators.JsAssetTypesValidatorTests" Expanded="true" />
+    <Node UniqueName="[0-1016]BundleTransformer.Tests.Core.Validators.CssAssetTypesValidatorTests" Expanded="true" />
+    <Node UniqueName="[0-1010]BundleTransformer.Tests.Core.Validators.JsAssetTypesValidatorTests" Expanded="true" />
   </Nodes>
 </VisualState>
