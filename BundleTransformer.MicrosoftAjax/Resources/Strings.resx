@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EnumConverter_EnumValueConversionFailed" xml:space="preserve">
-    <value>Can not convert value '{0}' of enumeration type '{1}' to value of enumeration type '{2}'.</value>
-  </data>
   <data name="ErrorDetails_EndColumn" xml:space="preserve">
     <value>End column</value>
   </data>
