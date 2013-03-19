@@ -10,6 +10,8 @@
 		// For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
 		public static void RegisterBundles(BundleCollection bundles)
 		{
+			bundles.UseCdn = true;
+
 			var cssTransformer = new CssTransformer();
 			var jsTransformer = new JsTransformer();
 			var nullOrderer = new NullOrderer();
@@ -41,9 +43,17 @@
 
 			bundles.Add(modernizrBundle);
 
+			var jQueryBundle = new Bundle("~/Bundles/Jquery", 
+				"http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js");
+			jQueryBundle.Include("~/Scripts/jquery-{version}.js");
+			jQueryBundle.Transforms.Add(jsTransformer);
+			jQueryBundle.Orderer = nullOrderer;
+			jQueryBundle.CdnFallbackExpression = "window.jquery";
+
+			bundles.Add(jQueryBundle);
+
 			var commonScriptsBundle = new Bundle("~/Bundles/CommonScripts");
 			commonScriptsBundle.Include("~/Scripts/MicrosoftAjax.js",
-				"~/Scripts/jquery-{version}.js",
 				"~/Scripts/jquery-ui-{version}.js",
 				"~/Scripts/jquery.validate.js",
 				"~/Scripts/jquery.validate.unobtrusive.js",
