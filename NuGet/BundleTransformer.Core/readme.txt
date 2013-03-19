@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-               README file for Bundle Transformer: Core 1.6.24
+           README file for Bundle Transformer: Core 1.7.0 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -38,8 +38,8 @@
    =============
    RELEASE NOTES
    =============
-   Added support of *.coffee.md file extension (CoffeeScript
-   Markdown-files).
+   Added support of Microsoft ASP.NET Web Optimization Framework 
+   1.1.0 Beta 1.
 
    =============
    DOCUMENTATION

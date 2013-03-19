@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-          README file for Bundle Transformer: Sass and SCSS 1.6.18
+       README file for Bundle Transformer: Sass and SCSS 1.7.0 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -16,12 +16,6 @@
    SCSS-code to CSS-code.
    Also contains HTTP-handler SassAndScssAssetHandler, which is 
    responsible for text output of translated Sass- or SCSS-asset.
-   
-   =============
-   RELEASE NOTES
-   =============
-   Fixed bug #21 "Files that contain @ do net get resolved by 
-   CssRelativePathResolver properly".
    
    =============
    DOCUMENTATION

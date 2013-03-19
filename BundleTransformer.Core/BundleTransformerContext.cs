@@ -31,22 +31,22 @@
 			new Lazy<HttpApplicationInfo>(() => new HttpApplicationInfo());
 
 		/// <summary>
-		/// File system wrapper 
+		/// Virtual file system wrapper 
 		/// </summary>
-		private readonly Lazy<FileSystemWrapper> _fileSystemWrapper
-			= new Lazy<FileSystemWrapper>();
+		private readonly Lazy<VirtualFileSystemWrapper> _virtualFileSystemWrapper 
+			= new Lazy<VirtualFileSystemWrapper>();
+
+		/// <summary>
+		/// Common relative path resolver
+		/// </summary>
+		private readonly Lazy<CommonRelativePathResolver> _commonRelativePathResolver
+			= new Lazy<CommonRelativePathResolver>();
 
 		/// <summary>
 		/// CSS relative path resolver
 		/// </summary>
 		private readonly Lazy<CssRelativePathResolver> _cssRelativePathResolver
 			= new Lazy<CssRelativePathResolver>();
-
-		/// <summary>
-		/// JS relative path resolver
-		/// </summary>
-		private readonly Lazy<JsRelativePathResolver> _jsRelativePathResolver
-			= new Lazy<JsRelativePathResolver>();
 
 		/// <summary>
 		/// Configuration settings of core
@@ -139,12 +139,21 @@
 		}
 
 		/// <summary>
-		/// Gets instance of the file system wrapper
+		/// Gets instance of the virtual file system wrapper
 		/// </summary>
-		/// <returns>File system wrapper</returns>
-		public FileSystemWrapper GetFileSystemWrapper()
+		/// <returns>Virtual file system wrapper</returns>
+		public VirtualFileSystemWrapper GetVirtualFileSystemWrapper()
 		{
-			return _fileSystemWrapper.Value;
+			return _virtualFileSystemWrapper.Value;
+		}
+
+		/// <summary>
+		/// Gets instance of the common relative path resolver
+		/// </summary>
+		/// <returns>Common relative path resolver</returns>
+		public CommonRelativePathResolver GetCommonRelativePathResolver()
+		{
+			return _commonRelativePathResolver.Value;
 		}
 
 		/// <summary>
@@ -154,15 +163,6 @@
 		public CssRelativePathResolver GetCssRelativePathResolver()
 		{
 			return _cssRelativePathResolver.Value;
-		}
-
-		/// <summary>
-		/// Gets instance of the JS relative path resolver
-		/// </summary>
-		/// <returns>Script relative path resolver</returns>
-		public JsRelativePathResolver GetJsRelativePathResolver()
-		{
-			return _jsRelativePathResolver.Value;
 		}
 
 		/// <summary>

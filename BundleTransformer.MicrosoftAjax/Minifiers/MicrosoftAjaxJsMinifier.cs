@@ -516,11 +516,11 @@
 			foreach (var asset in assetsToProcessing)
 			{
 				string newContent = string.Empty;
-				string assetPath = asset.Path;
+				string assetVirtualPath = asset.VirtualPath;
 
 				var jsParser = new JSParser(asset.Content)
 				{
-				    FileContext = assetPath
+					FileContext = assetVirtualPath
 				};
 				jsParser.CompilerError += ParserErrorHandler;
 
@@ -535,8 +535,8 @@
 				catch (Exception e)
 				{
 				    throw new AssetMinificationException(
-				        string.Format(CoreStrings.Minifiers_MinificationFailed, 
-							CODE_TYPE, assetPath, MINIFIER_NAME, e.Message), e);
+				        string.Format(CoreStrings.Minifiers_MinificationFailed,
+							CODE_TYPE, assetVirtualPath, MINIFIER_NAME, e.Message), e);
 				}
 				finally
 				{

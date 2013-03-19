@@ -5,7 +5,6 @@
 	using System.IO;
 	using System.Linq;
 	using System.Text.RegularExpressions;
-	using System.Web;
 
 	using dotless.Core;
 	using dotless.Core.configuration;
@@ -45,14 +44,9 @@
 				RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		/// <summary>
-		/// Object HttpContext
+		/// Relative path resolver
 		/// </summary>
-		private readonly HttpContextBase _httpContext;
-
-		/// <summary>
-		/// CSS relative path resolver
-		/// </summary>
-		private readonly ICssRelativePathResolver _cssRelativePathResolver;
+		private readonly IRelativePathResolver _relativePathResolver;
 
 		/// <summary>
 		/// Gets or sets a severity level of errors
@@ -66,22 +60,18 @@
 		/// Constructs instance of LESS-translator
 		/// </summary>
 		public LessTranslator()
-			: this(new HttpContextWrapper(HttpContext.Current),
-				BundleTransformerContext.Current.GetCssRelativePathResolver(),
+			: this(BundleTransformerContext.Current.GetCommonRelativePathResolver(),
 				BundleTransformerContext.Current.GetLessLiteConfiguration())
 		{ }
 
 		/// <summary>
 		/// Constructs instance of LESS-translator
 		/// </summary>
-		/// <param name="httpContext">Object HttpContext</param>
-		/// <param name="cssRelativePathResolver">CSS relative path resolver</param>
+		/// <param name="relativePathResolver">Relative path resolver</param>
 		/// <param name="lessConfig">Configuration settings of LESS-translator</param>
-		public LessTranslator(HttpContextBase httpContext, ICssRelativePathResolver cssRelativePathResolver, 
-			LessLiteSettings lessConfig)
+		public LessTranslator(IRelativePathResolver relativePathResolver, LessLiteSettings lessConfig)
 		{
-			_httpContext = httpContext;
-			_cssRelativePathResolver = cssRelativePathResolver;
+			_relativePathResolver = relativePathResolver;
 
 			UseNativeMinification = lessConfig.UseNativeMinification;
 			Severity = lessConfig.Severity;
@@ -170,20 +160,17 @@
 		private void InnerTranslate(IAsset asset, ILessEngine lessEngine, bool enableNativeMinification)
 		{
 			string newContent;
-			string assetPath = asset.Path;
+			string assetVirtualPath = asset.VirtualPath;
 			string assetUrl = asset.Url;
-			IList<string> importedFilePaths;
+			IList<string> virtualPathDependencies;
 
 			try
 			{
 				newContent = ResolveImportsRelativePaths(asset.Content, assetUrl);
 				newContent = lessEngine.TransformToCss(newContent, null);
-				IEnumerable<string> importedFileUrls = lessEngine.GetImports();
+				IEnumerable<string> importedFiles = lessEngine.GetImports();
 
-				importedFilePaths = importedFileUrls
-					.Select(u => _httpContext.Server.MapPath(u))
-					.ToList()
-					;
+				virtualPathDependencies = importedFiles.ToList();
 			}
 			catch (FileNotFoundException)
 			{
@@ -193,18 +180,18 @@
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationSyntaxError,
-						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetPath, e.Message));
+						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message));
 			}
 			catch (Exception e)
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationFailed,
-						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetPath, e.Message), e);
+						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message), e);
 			}
 
 			asset.Content = newContent;
 			asset.Minified = enableNativeMinification;
-			asset.RequiredFilePaths = importedFilePaths;
+			asset.VirtualPathDependencies = virtualPathDependencies;
 		}
 
 		/// <summary>
@@ -229,7 +216,7 @@
 					result = string.Format("{0} {1}{2}{1}",
 						importDirectiveValue,
 						quoteValue,
-						_cssRelativePathResolver.ResolveRelativePath(path, urlValue));
+						_relativePathResolver.ResolveRelativePath(path, urlValue));
 				}
 
 				return result;

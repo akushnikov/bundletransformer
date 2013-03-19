@@ -1,11 +1,9 @@
 ﻿namespace BundleTransformer.Core.Assets
 {
-	using System;
 	using System.Collections.Generic;
 	using System.Text.RegularExpressions;
 
 	using FileSystem;
-	using Web;
 
 	/// <summary>
 	/// Asset
@@ -22,21 +20,6 @@
 		/// </summary>
 		private const string JS_FILE_EXTENSION = ".js";
 	
-		/// <summary>
-		/// Regular expression for web application root path
-		/// </summary>
-		private readonly Regex _applicationRootPathRegex;
-
-		/// <summary>
-		/// URL of web application root
-		/// </summary>
-		private readonly string _applicationRootUrl;
-
-		/// <summary>
-		/// File system wrapper
-		/// </summary>
-		private readonly IFileSystemWrapper _fileSystemWrapper;
-
 		/// <summary>
 		/// Regular expression to determine whether
 		/// asset is CSS-file based on its extension
@@ -122,41 +105,43 @@
 			RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		/// <summary>
-		/// Gets or sets path to asset file
+		/// Virtual file system wrapper
 		/// </summary>
-		public string Path
+		private readonly IVirtualFileSystemWrapper _virtualFileSystemWrapper;
+
+		/// <summary>
+		/// Text content of asset
+		/// </summary>
+		private string _content;
+
+		/// <summary>
+		/// Gets or sets a virtual path to asset file
+		/// </summary>
+		public string VirtualPath
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// Gets or sets paths to the required asset files
-		/// </summary>
-		public IList<string> RequiredFilePaths
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets URL of asset file
+		/// Gets a URL of asset file
 		/// </summary>
 		public string Url
 		{
-			get
-			{
-				string url = _applicationRootPathRegex
-					.Replace(Path, _applicationRootUrl)
-					.Replace(@"\", @"/")
-					;
-
-				return url;
-			}
+			get { return _virtualFileSystemWrapper.ToAbsolutePath(VirtualPath); }
 		}
 
 		/// <summary>
-		/// Gets asset type
+		/// Gets or sets a list of virtual paths to other files required by the primary asset
+		/// </summary>
+		public IList<string> VirtualPathDependencies
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets a asset type
 		/// </summary>
 		public AssetType AssetType
 		{
@@ -173,18 +158,8 @@
 			set;
 		}
 
-		private DateTime _lastModifyDateTimeUtc;
 		/// <summary>
-		/// Gets date and time, in coordinated universal time (UTC), of the last modification of asset
-		/// </summary>
-		public DateTime LastModifyDateTimeUtc
-		{
-			get { return _lastModifyDateTimeUtc; }
-		}
-
-		private string _content;
-		/// <summary>
-		/// Gets or sets text content of asset 
+		/// Gets or sets a text content of asset 
 		/// </summary>
 		public string Content
 		{
@@ -237,29 +212,25 @@
 		/// <summary>
 		/// Constructs instance of Asset
 		/// </summary>
-		/// <param name="path">Path to asset file</param>
-		public Asset(string path) : this(path, BundleTransformerContext.Current.GetApplicationInfo(),
-			BundleTransformerContext.Current.GetFileSystemWrapper())
+		/// <param name="virtualPath">Virtual path to asset file</param>
+		public Asset(string virtualPath)
+			: this(virtualPath, BundleTransformerContext.Current.GetVirtualFileSystemWrapper())
 		{ }
 
 		/// <summary>
 		/// Constructs instance of Asset
 		/// </summary>
-		/// <param name="path">Path to asset file</param>
-		/// <param name="applicationInfo">Information about web application</param>
-		/// <param name="fileSystemWrapper">File system wrapper</param>
-		public Asset(string path, IHttpApplicationInfo applicationInfo, IFileSystemWrapper fileSystemWrapper)
+		/// <param name="virtualPath">Virtual path to asset file</param>
+		/// <param name="virtualFileSystemWrapper">file system wrapper</param>
+		public Asset(string virtualPath, IVirtualFileSystemWrapper virtualFileSystemWrapper)
 		{
-			_applicationRootPathRegex = new Regex("^" + Regex.Escape(applicationInfo.RootPath), 
-				RegexOptions.IgnoreCase);
-			_applicationRootUrl = applicationInfo.RootUrl;
-			_fileSystemWrapper = fileSystemWrapper;
+			_virtualFileSystemWrapper = virtualFileSystemWrapper;
 
-			Path = path;
-			RequiredFilePaths = new List<string>();
+			VirtualPath = virtualPath;
+			VirtualPathDependencies = new List<string>();
 			Minified = false;
 			Content = null;
-			AssetType = GetAssetType(Path);
+			AssetType = GetAssetType(virtualPath);
 		}
 
 
@@ -268,52 +239,51 @@
 		/// </summary>
 		public void RefreshContent()
 		{
-			_lastModifyDateTimeUtc = _fileSystemWrapper.GetFileLastWriteTimeUtc(Path);
-			_content = _fileSystemWrapper.GetFileTextContent(Path);
+			_content = _virtualFileSystemWrapper.GetFileTextContent(VirtualPath);
 		}
 
 		/// <summary>
 		/// Determines type of asset
 		/// </summary>
-		/// <param name="assetPath">Path to asset file</param>
+		/// <param name="assetVirtualPath">Virtual path to asset file</param>
 		/// <returns>Asset type</returns>
-		public static AssetType GetAssetType(string assetPath)
+		public static AssetType GetAssetType(string assetVirtualPath)
 		{
 			var assetType = AssetType.Unknown;
 
-			if (_cssFileExtensionRegex.IsMatch(assetPath))
+			if (_cssFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.Css;
 			}
-			else if (_jsFileExtensionRegex.IsMatch(assetPath))
+			else if (_jsFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.JavaScript;
 			}
-			else if (_lessFileExtensionRegex.IsMatch(assetPath))
+			else if (_lessFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.Less;
 			}
-			else if (_sassFileExtensionRegex.IsMatch(assetPath))
+			else if (_sassFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.Sass;
 			}
-			else if (_scssFileExtensionRegex.IsMatch(assetPath))
+			else if (_scssFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.Scss;
 			}
-			else if (_coffeeFileExtensionRegex.IsMatch(assetPath))
+			else if (_coffeeFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.CoffeeScript;
 			}
-			else if (_litcoffeeFileExtensionRegex.IsMatch(assetPath))
+			else if (_litcoffeeFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.LiterateCoffeeScript;
 			}
-			else if (_coffeeMdFileExtensionRegex.IsMatch(assetPath))
+			else if (_coffeeMdFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.CoffeeScriptMarkdown;
 			}
-			else if (_tsFileExtensionRegex.IsMatch(assetPath))
+			else if (_tsFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.TypeScript;
 			}
@@ -325,60 +295,60 @@
 		/// Checks whether an asset is minified version of CSS-file 
 		/// with *.min.css extension
 		/// </summary>
-		/// <param name="assetPath">CSS-asset file path</param>
+		/// <param name="assetVirtualPath">CSS-asset virtual file path</param>
 		/// <returns>Checking result (true - with *.min.css extension; 
 		/// false - without *.min.css extension)</returns>
-		public static bool IsCssFileWithMinExtension(string assetPath)
+		public static bool IsCssFileWithMinExtension(string assetVirtualPath)
 		{
-			return _cssFileWithMinExtensionRegex.IsMatch(assetPath);
+			return _cssFileWithMinExtensionRegex.IsMatch(assetVirtualPath);
 		}
 
 		/// <summary>
 		/// Checks whether an asset is debug version of JS-file 
 		/// with *.debug.js extension
 		/// </summary>
-		/// <param name="assetPath">JS-asset file path</param>
+		/// <param name="assetVirtualPath">JS-asset virtual file path</param>
 		/// <returns>Checking result (true - with *.debug.js extension;
 		/// false - without *.debug.js extension)</returns>
-		public static bool IsJsFileWithDebugExtension(string assetPath)
+		public static bool IsJsFileWithDebugExtension(string assetVirtualPath)
 		{
-			return _jsFileWithDebugExtensionRegex.IsMatch(assetPath);
+			return _jsFileWithDebugExtensionRegex.IsMatch(assetVirtualPath);
 		}
 
 		/// <summary>
 		/// Checks whether an asset is minified version of JS-file with *.min.js extension
 		/// </summary>
-		/// <param name="assetPath">JS-asset file path</param>
+		/// <param name="assetVirtualPath">JS-asset virtual file path</param>
 		/// <returns>Checking result (true - with *.min.js extension;
 		/// false - without *.min.js extension)</returns>
-		public static bool IsJsFileWithMinExtension(string assetPath)
+		public static bool IsJsFileWithMinExtension(string assetVirtualPath)
 		{
-			return _jsFileWithMinExtensionRegex.IsMatch(assetPath);
+			return _jsFileWithMinExtensionRegex.IsMatch(assetVirtualPath);
 		}
 
 		/// <summary>
 		/// Removes additional file extension from path of the specified CSS-file
 		/// </summary>
-		/// <param name="assetPath">CSS-asset file path</param>
-		/// <returns>CSS-asset file path without additional file extension</returns>
-		public static string RemoveAdditionalCssFileExtension(string assetPath)
+		/// <param name="assetVirtualPath">CSS-asset virtual file path</param>
+		/// <returns>CSS-asset virtual file path without additional file extension</returns>
+		public static string RemoveAdditionalCssFileExtension(string assetVirtualPath)
 		{
-			string newAssetPath = _cssFileWithMinExtensionRegex.Replace(assetPath, CSS_FILE_EXTENSION);
+			string newAssetVirtualPath = _cssFileWithMinExtensionRegex.Replace(assetVirtualPath, CSS_FILE_EXTENSION);
 
-			return newAssetPath;
+			return newAssetVirtualPath;
 		}
 
 		/// <summary>
 		/// Removes additional file extension from path of the specified JS-file
 		/// </summary>
-		/// <param name="assetPath">JS-asset file path</param>
-		/// <returns>JS-asset file path without additional file extension</returns>
-		public static string RemoveAdditionalJsFileExtension(string assetPath)
+		/// <param name="assetVirtualPath">JS-asset virtual file path</param>
+		/// <returns>JS-asset virtual file path without additional file extension</returns>
+		public static string RemoveAdditionalJsFileExtension(string assetVirtualPath)
 		{
-			string newAssetPath = _jsFileWithDebugExtensionRegex.Replace(assetPath, JS_FILE_EXTENSION);
-			newAssetPath = _jsFileWithMinExtensionRegex.Replace(newAssetPath, JS_FILE_EXTENSION);
+			string newAssetVirtualPath = _jsFileWithDebugExtensionRegex.Replace(assetVirtualPath, JS_FILE_EXTENSION);
+			newAssetVirtualPath = _jsFileWithMinExtensionRegex.Replace(newAssetVirtualPath, JS_FILE_EXTENSION);
 
-			return newAssetPath;
+			return newAssetVirtualPath;
 		}
 	}
 }

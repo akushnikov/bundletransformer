@@ -1,8 +1,6 @@
 ﻿namespace BundleTransformer.Tests.TypeScript.Translators
 {
 	using System.Collections.Generic;
-	using System.IO;
-	using System.Web;
 
 	using Moq;
 	using NUnit.Framework;
@@ -16,39 +14,36 @@
 	[TestFixture]
 	public class TypeScriptTranslatorTests
 	{
-		private const string APPLICATION_ROOT_PATH =
-			@"D:\Projects\BundleTransformer\BundleTransformer.Example.Mvc\";
-		private const string SCRIPTS_DIRECTORY_PATH =
-			@"D:\Projects\BundleTransformer\BundleTransformer.Example.Mvc\Scripts\";
-		private const string SCRIPTS_DIRECTORY_URL = @"/Scripts/";
+		private const string SCRIPTS_DIRECTORY_VIRTUAL_PATH = "/Scripts/";
+		private const string SCRIPTS_DIRECTORY_URL = "/Scripts/";
 
 		[Test]
 		public void FillingOfDependenciesIsCorrect()
 		{
 			// Arrange
-			var httpServerUtility = new MockHttpServerUtility();
-			var httpContextMock = new Mock<HttpContextBase>();
-			httpContextMock
-				.SetupGet(p => p.Server)
-				.Returns(httpServerUtility)
-				;
-			HttpContextBase httpContext = httpContextMock.Object;
+			var virtualFileSystemMock = new Mock<IVirtualFileSystemWrapper>();
 
-			var fileSystemMock = new Mock<IFileSystemWrapper>();
-			fileSystemMock
-				.Setup(fs => fs.FileExists(Path.Combine(SCRIPTS_DIRECTORY_PATH, "jquery.d.ts")))
+
+			string jqueryTsAssetVirtualPath = Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, 
+				"jquery.d.ts");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(jqueryTsAssetVirtualPath))
 				.Returns(true)
 				;
-			fileSystemMock
-				.Setup(fs => fs.GetFileTextContent(Path.Combine(SCRIPTS_DIRECTORY_PATH, "jquery.d.ts")))
-				.Returns(@"")
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(jqueryTsAssetVirtualPath))
+				.Returns("")
 				;
-			fileSystemMock
-				.Setup(fs => fs.FileExists(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ITranslatorBadge.d.ts")))
+
+
+			string iTranslatorBadgeTsAssetVirtualPath = Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, 
+				"ITranslatorBadge.d.ts");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(iTranslatorBadgeTsAssetVirtualPath))
 				.Returns(true)
 				;
-			fileSystemMock
-				.Setup(fs => fs.GetFileTextContent(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ITranslatorBadge.d.ts")))
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(iTranslatorBadgeTsAssetVirtualPath))
 				.Returns(@"interface ITranslatorBadge {
     getText(): string;
     setText(text: string): void;
@@ -56,12 +51,16 @@
     hide(): void;
 }")
 				;
-			fileSystemMock
-				.Setup(fs => fs.FileExists(Path.Combine(SCRIPTS_DIRECTORY_PATH, "TranslatorBadge.ts")))
+
+
+			string translatorBadgeTsAssetVirtualPath = Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, 
+				"TranslatorBadge.ts");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(translatorBadgeTsAssetVirtualPath))
 				.Returns(true)
 				;
-			fileSystemMock
-				.Setup(fs => fs.GetFileTextContent(Path.Combine(SCRIPTS_DIRECTORY_PATH, "TranslatorBadge.ts")))
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(translatorBadgeTsAssetVirtualPath))
 				.Returns(@"/// <reference path=""jquery.d.ts"" />
 /// <reference path=""ITranslatorBadge.d.ts"" />
 
@@ -91,12 +90,16 @@ class TranslatorBadge implements ITranslatorBadge {
     }
 }")
 				;
-			fileSystemMock
-				.Setup(fs => fs.FileExists(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ColoredTranslatorBadge.ts")))
+
+
+			string coloredTranslatorBadgeTsAssetVirtualPath = Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH,
+				"ColoredTranslatorBadge.ts");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(coloredTranslatorBadgeTsAssetVirtualPath))
 				.Returns(true)
 				;
-			fileSystemMock
-				.Setup(fs => fs.GetFileTextContent(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ColoredTranslatorBadge.ts")))
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(coloredTranslatorBadgeTsAssetVirtualPath))
 				.Returns(@"/// <reference path=""jquery.d.ts"" />
 /// <reference path=""TranslatorBadge.ts"" />
 
@@ -119,12 +122,13 @@ class ColoredTranslatorBadge extends TranslatorBadge {
 }")
 				;
 
-			IFileSystemWrapper fileSystemWrapper = fileSystemMock.Object;
-			var jsRelativePathResolver = new MockJsRelativePathResolver();
+
+			IVirtualFileSystemWrapper virtualFileSystemWrapper = virtualFileSystemMock.Object;
+			var relativePathResolver = new MockRelativePathResolver();
 			var tsConfig = new TypeScriptSettings();
 
-			var tsTranslator = new TypeScriptTranslator(httpContext, fileSystemWrapper, 
-				jsRelativePathResolver, tsConfig);
+			var tsTranslator = new TypeScriptTranslator(virtualFileSystemWrapper, 
+				relativePathResolver, tsConfig);
 
 			const string assetContent = @"/// <reference path=""ColoredTranslatorBadge.ts"" />
 var TS_BADGE_TEXT = ""TypeScript"";
@@ -142,25 +146,13 @@ tsBadge.setBorderColor(TS_BADGE_COLOR);";
 
 			// Assert
 			Assert.AreEqual(4, dependencies.Count);
-			Assert.AreEqual(Path.Combine(SCRIPTS_DIRECTORY_PATH, "jquery.d.ts"),
-				dependencies[0].Path);
-			Assert.AreEqual(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ITranslatorBadge.d.ts"),
-				dependencies[1].Path);
-			Assert.AreEqual(Path.Combine(SCRIPTS_DIRECTORY_PATH, "TranslatorBadge.ts"), 
-				dependencies[2].Path);
-			Assert.AreEqual(Path.Combine(SCRIPTS_DIRECTORY_PATH, "ColoredTranslatorBadge.ts"),
-				dependencies[3].Path);
+			Assert.AreEqual(jqueryTsAssetVirtualPath, dependencies[0].VirtualPath);
+			Assert.AreEqual(iTranslatorBadgeTsAssetVirtualPath, dependencies[1].VirtualPath);
+			Assert.AreEqual(translatorBadgeTsAssetVirtualPath, dependencies[2].VirtualPath);
+			Assert.AreEqual(coloredTranslatorBadgeTsAssetVirtualPath, dependencies[3].VirtualPath);
 		}
 
-		private class MockHttpServerUtility : HttpServerUtilityBase
-		{
-			public override string MapPath(string path)
-			{
-				return Path.Combine(APPLICATION_ROOT_PATH, Utils.RemoveFirstSlashFromUrl(path.Replace("/", @"\")));
-			}
-		}
-
-		private class MockJsRelativePathResolver : IJsRelativePathResolver
+		private class MockRelativePathResolver : IRelativePathResolver
 		{
 			public string ResolveRelativePath(string basePath, string relativePath)
 			{

@@ -33,11 +33,11 @@
 
 			foreach (var asset in assets)
 			{
-				string newAssetPath = Asset.RemoveAdditionalCssFileExtension(asset.Path);
+				string newAssetVirtualPath = Asset.RemoveAdditionalCssFileExtension(asset.VirtualPath);
 				bool assetExist = processedAssets
-				    .Where(a => 
-						Asset.RemoveAdditionalCssFileExtension(a.Path).ToUpperInvariant() == newAssetPath.ToUpperInvariant())
-				    .Count() > 0;
+					.Count(a =>
+						Asset.RemoveAdditionalCssFileExtension(a.VirtualPath).ToUpperInvariant() == newAssetVirtualPath.ToUpperInvariant()
+					) > 0;
 
 				if (!assetExist)
 				{

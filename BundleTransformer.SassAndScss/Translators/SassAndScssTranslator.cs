@@ -63,19 +63,19 @@
 				RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		/// <summary>
-		/// Object HttpContext
+		/// HTTP context
 		/// </summary>
 		private readonly HttpContextBase _httpContext;
 
 		/// <summary>
-		/// File system wrapper
+		/// Virtual file system wrapper
 		/// </summary>
-		private readonly IFileSystemWrapper _fileSystemWrapper;
+		private readonly IVirtualFileSystemWrapper _virtualFileSystemWrapper;
 
 		/// <summary>
-		/// CSS relative path resolver
+		/// Relative path resolver
 		/// </summary>
-		private readonly ICssRelativePathResolver _cssRelativePathResolver;
+		private readonly IRelativePathResolver _relativePathResolver;
 
 		/// <summary>
 		/// Sass- and SCSS-compiler
@@ -88,24 +88,26 @@
 		/// </summary>
 		public SassAndScssTranslator()
 			: this(new HttpContextWrapper(HttpContext.Current),
-				BundleTransformerContext.Current.GetFileSystemWrapper(),
-				BundleTransformerContext.Current.GetCssRelativePathResolver(),
+				BundleTransformerContext.Current.GetVirtualFileSystemWrapper(),
+				BundleTransformerContext.Current.GetCommonRelativePathResolver(),
 				BundleTransformerContext.Current.GetSassAndScssConfiguration())
 		{ }
 
 		/// <summary>
 		/// Constructs instance of Sass- and SCSS-translator
 		/// </summary>
-		/// <param name="httpContext">Object HttpContext</param>
-		/// <param name="fileSystemWrapper">File system wrapper</param>
-		/// <param name="cssRelativePathResolver">CSS relative path resolver</param>
+		/// <param name="httpContext">HTTP context</param>
+		/// <param name="virtualFileSystemWrapper">Virtual file system wrapper</param>
+		/// <param name="relativePathResolver">Relative path resolver</param>
 		/// <param name="sassAndScssConfig">Configuration settings of Sass- and SCSS-translator</param>
-		public SassAndScssTranslator(HttpContextBase httpContext, IFileSystemWrapper fileSystemWrapper,
-			ICssRelativePathResolver cssRelativePathResolver, SassAndScssSettings sassAndScssConfig)
+		public SassAndScssTranslator(HttpContextBase httpContext,
+			IVirtualFileSystemWrapper virtualFileSystemWrapper, 
+			IRelativePathResolver relativePathResolver, 
+			SassAndScssSettings sassAndScssConfig)
 		{
 			_httpContext = httpContext;
-			_fileSystemWrapper = fileSystemWrapper;
-			_cssRelativePathResolver = cssRelativePathResolver;
+			_virtualFileSystemWrapper = virtualFileSystemWrapper;
+			_relativePathResolver = relativePathResolver;
 			_sassAndScssCompiler = new SassAndScssCompiler();
 
 			UseNativeMinification = sassAndScssConfig.UseNativeMinification;
@@ -167,13 +169,14 @@
 		{
 			string assetTypeName = (asset.AssetType == AssetType.Scss) ? "SCSS" : "Sass";
 			string newContent;
-			string assetPath = asset.Path;
-			var importedFilePaths = new List<string>();
+			string assetVirtualPath = asset.VirtualPath;
+			string assetPath = _httpContext.Server.MapPath(assetVirtualPath);
+			var virtualPathDependencies = new List<string>();
 
 			try
 			{
 				newContent = asset.Content;
-				FillImportedFilePaths(newContent, asset.Url, importedFilePaths);
+				FillDependencies(newContent, asset.Url, virtualPathDependencies);
 
 				newContent = _sassAndScssCompiler.Compile(newContent, assetPath, enableNativeMinification);
 			}
@@ -185,18 +188,18 @@
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationSyntaxError,
-						assetTypeName, OUTPUT_CODE_TYPE, assetPath, e.Message));
+						assetTypeName, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message));
 			}
 			catch (Exception e)
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationFailed,
-						assetTypeName, OUTPUT_CODE_TYPE, assetPath, e.Message), e);
+						assetTypeName, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message), e);
 			}
 
 			asset.Content = newContent;
 			asset.Minified = enableNativeMinification;
-			asset.RequiredFilePaths = importedFilePaths;
+			asset.VirtualPathDependencies = virtualPathDependencies;
 		}
 
 		/// <summary>
@@ -205,9 +208,9 @@
 		/// </summary>
 		/// <param name="assetContent">Text content of Sass- or SCSS-asset</param>
 		/// <param name="assetUrl">URL of Sass- or SCSS-asset file</param>
-		/// <param name="importedFilePaths">List of Sass- and SCSS-files, that were added to a 
+		/// <param name="virtualPathDependencies">List of Sass- and SCSS-files, that were added to a 
 		/// Sass- or SCSS-asset by using the @import directive</param>
-		public void FillImportedFilePaths(string assetContent, string assetUrl, IList<string> importedFilePaths)
+		public void FillDependencies(string assetContent, string assetUrl, IList<string> virtualPathDependencies)
 		{
 			string assetExtension = Path.GetExtension(assetUrl);
 			if (!string.IsNullOrEmpty(assetExtension))
@@ -244,58 +247,62 @@
 						List<string> urlList = Utils.ConvertToStringCollection(urlListString, ',', true).ToList();
 						foreach (string url in urlList)
 						{
-							string importedAssetUrl = _cssRelativePathResolver.ResolveRelativePath(
+							string importedAssetUrl = _relativePathResolver.ResolveRelativePath(
 								assetUrl, url.Trim());
+							string importedAssetVirtualPath = importedAssetUrl;
 							string importedAssetExtension = Path.GetExtension(importedAssetUrl);
 
 							if (string.Equals(importedAssetExtension, SASS_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase)
 								|| string.Equals(importedAssetExtension, SCSS_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
 							{
-								string importedAssetPath = _httpContext.Server.MapPath(importedAssetUrl);
-								if (_fileSystemWrapper.FileExists(importedAssetPath))
+								if (_virtualFileSystemWrapper.FileExists(importedAssetVirtualPath))
 								{
-									importedFilePaths.Add(importedAssetPath);
+									virtualPathDependencies.Add(importedAssetVirtualPath);
 
-									string importedAssetContent = _fileSystemWrapper.GetFileTextContent(importedAssetPath);
-									FillImportedFilePaths(importedAssetContent, importedAssetUrl, importedFilePaths);
+									string importedAssetContent = _virtualFileSystemWrapper.GetFileTextContent(
+										importedAssetVirtualPath);
+									FillDependencies(importedAssetContent, importedAssetUrl, 
+										virtualPathDependencies);
 								}
 								else
 								{
 									throw new FileNotFoundException(
-										string.Format(Strings.Common_FileNotExist, importedAssetPath));
+										string.Format(Strings.Common_FileNotExist, importedAssetVirtualPath));
 								}
 							}
 							else if (!string.Equals(importedAssetExtension, CSS_FILE_EXTENSION, 
 								StringComparison.InvariantCultureIgnoreCase))
 							{
-								string importedAssetPath = _httpContext.Server.MapPath(importedAssetUrl);
+								importedAssetVirtualPath = importedAssetUrl;
 
 								string newImportedAssetExtension = assetExtension;
 								string newImportedAssetUrl = importedAssetUrl + newImportedAssetExtension;
-								string newImportedAssetPath = importedAssetPath + newImportedAssetExtension;
-								bool newImportedAssetExists = _fileSystemWrapper.FileExists(newImportedAssetPath);
+								string newImportedAssetVirtualPath = importedAssetVirtualPath + newImportedAssetExtension;
+								bool newImportedAssetExists = _virtualFileSystemWrapper.FileExists(newImportedAssetVirtualPath);
 
 								if (!newImportedAssetExists)
 								{
 									newImportedAssetExtension = string.Equals(newImportedAssetExtension, SASS_FILE_EXTENSION,
 										StringComparison.InvariantCultureIgnoreCase) ? SCSS_FILE_EXTENSION : SASS_FILE_EXTENSION;
 									newImportedAssetUrl = importedAssetUrl + newImportedAssetExtension;
-									newImportedAssetPath = importedAssetPath + newImportedAssetExtension;
+									newImportedAssetVirtualPath = importedAssetVirtualPath + newImportedAssetExtension;
 
-									newImportedAssetExists = _fileSystemWrapper.FileExists(newImportedAssetPath);
+									newImportedAssetExists = _virtualFileSystemWrapper.FileExists(newImportedAssetVirtualPath);
 								}
 
 								if (newImportedAssetExists)
 								{
-									importedFilePaths.Add(newImportedAssetPath);
+									virtualPathDependencies.Add(newImportedAssetVirtualPath);
 
-									string importedAssetContent = _fileSystemWrapper.GetFileTextContent(newImportedAssetPath);
-									FillImportedFilePaths(importedAssetContent, newImportedAssetUrl, importedFilePaths);
+									string importedAssetContent = _virtualFileSystemWrapper.GetFileTextContent(
+										newImportedAssetVirtualPath);
+									FillDependencies(importedAssetContent, newImportedAssetUrl,
+										virtualPathDependencies);
 								}
 								else
 								{
 									throw new FileNotFoundException(
-										string.Format(Strings.Common_FileNotExist, newImportedAssetPath));
+										string.Format(Strings.Common_FileNotExist, newImportedAssetVirtualPath));
 								}
 							}	
 						}

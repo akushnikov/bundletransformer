@@ -6,7 +6,6 @@
 	using System.IO;
 	using System.Linq;
 	using System.Text.RegularExpressions;
-	using System.Web;
 
 	using Core;
 	using Core.Assets;
@@ -50,19 +49,14 @@
 				RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		/// <summary>
-		/// Object HttpContext
+		/// Virtual file system wrapper
 		/// </summary>
-		private readonly HttpContextBase _httpContext;
+		private readonly IVirtualFileSystemWrapper _virtualFileSystemWrapper;
 
 		/// <summary>
-		/// File system wrapper
+		/// Relative path resolver
 		/// </summary>
-		private readonly IFileSystemWrapper _fileSystemWrapper;
-
-		/// <summary>
-		/// JS relative path resolver
-		/// </summary>
-		private readonly IJsRelativePathResolver _jsRelativePathResolver;
+		private readonly IRelativePathResolver _relativePathResolver;
 
 		/// <summary>
 		/// Asset content cache
@@ -128,25 +122,22 @@
 		/// Constructs instance of TypeScript-translator
 		/// </summary>
 		public TypeScriptTranslator()
-			: this(new HttpContextWrapper(HttpContext.Current),
-				BundleTransformerContext.Current.GetFileSystemWrapper(),
-				BundleTransformerContext.Current.GetJsRelativePathResolver(),
+			: this(BundleTransformerContext.Current.GetVirtualFileSystemWrapper(),
+				BundleTransformerContext.Current.GetCommonRelativePathResolver(),
 				BundleTransformerContext.Current.GetTypeScriptConfiguration())
 		{ }
 
 		/// <summary>
 		/// Constructs instance of TypeScript-translator
 		/// </summary>
-		/// <param name="httpContext">Object HttpContext</param>
-		/// <param name="fileSystemWrapper">File system wrapper</param>
-		/// <param name="jsRelativePathResolver">JS relative path resolver</param>
+		/// <param name="virtualFileSystemWrapper">Virtual file system wrapper</param>
+		/// <param name="relativePathResolver">Relative path resolver</param>
 		/// <param name="tsConfig">Configuration settings of TypeScript-translator</param>
-		public TypeScriptTranslator(HttpContextBase httpContext, IFileSystemWrapper fileSystemWrapper,
-			IJsRelativePathResolver jsRelativePathResolver, TypeScriptSettings tsConfig)
+		public TypeScriptTranslator(IVirtualFileSystemWrapper virtualFileSystemWrapper,
+			IRelativePathResolver relativePathResolver, TypeScriptSettings tsConfig)
 		{
-			_httpContext = httpContext;
-			_fileSystemWrapper = fileSystemWrapper;
-			_jsRelativePathResolver = jsRelativePathResolver;
+			_virtualFileSystemWrapper = virtualFileSystemWrapper;
+			_relativePathResolver = relativePathResolver;
 			_assetContentCache = new Hashtable();
 
 			StyleSettings styleConfig = tsConfig.Style;
@@ -253,13 +244,13 @@
 		private void InnerTranslate(IAsset asset, TypeScriptCompiler typeScriptCompiler, bool enableNativeMinification)
 		{
 			string newContent;
+			string assetVirtualPath = asset.VirtualPath;
 			string assetUrl = asset.Url;
-			string assetPath = asset.Path;
 			var dependencies = new List<Dependency>();
 
 			try
 			{
-				string content = GetAssetFileTextContent(assetPath);
+				string content = GetAssetFileTextContent(assetVirtualPath);
 				FillDependencies(assetUrl, content, assetUrl, dependencies);
 
 				newContent = typeScriptCompiler.Compile(content, dependencies);
@@ -269,19 +260,19 @@
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationSyntaxError,
-						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetPath, e.Message));
+						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message));
 			}
 			catch (Exception e)
 			{
 				throw new AssetTranslationException(
 					string.Format(CoreStrings.Translators_TranslationFailed,
-						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetPath, e.Message));
+						INPUT_CODE_TYPE, OUTPUT_CODE_TYPE, assetVirtualPath, e.Message));
 			}
 
 			asset.Content = newContent;
 			asset.Minified = enableNativeMinification;
-			asset.RequiredFilePaths = dependencies
-				.Select(d => d.Path)
+			asset.VirtualPathDependencies = dependencies
+				.Select(d => d.VirtualPath)
 				.Distinct()
 				.ToList()
 				;
@@ -349,7 +340,7 @@
 					string dependencyAssetUrl = match.Groups["url"].Value;
 					if (!string.IsNullOrWhiteSpace(dependencyAssetUrl))
 					{
-						dependencyAssetUrl = _jsRelativePathResolver.ResolveRelativePath(
+						dependencyAssetUrl = _relativePathResolver.ResolveRelativePath(
 							parentAssetUrl, dependencyAssetUrl.Trim());
 						if (string.Equals(dependencyAssetUrl, rootAssetUrl, StringComparison.InvariantCultureIgnoreCase))
 						{
@@ -363,14 +354,14 @@
 							var duplicateDependency = GetDependencyByUrl(dependencies, dependencyAssetUrl);
 							if (duplicateDependency == null)
 							{
-								string dependencyAssetPath = _httpContext.Server.MapPath(dependencyAssetUrl);
-								if (AssetFileExists(dependencyAssetPath))
+								string dependencyAssetVirtualPath = dependencyAssetUrl;
+								if (AssetFileExists(dependencyAssetVirtualPath))
 								{
-									string dependencyAssetContent = GetAssetFileTextContent(dependencyAssetPath);
+									string dependencyAssetContent = GetAssetFileTextContent(dependencyAssetVirtualPath);
 									var dependency = new Dependency
 									{
+										VirtualPath = dependencyAssetVirtualPath,
 										Url = dependencyAssetUrl,
-										Path = dependencyAssetPath,
 										Content = dependencyAssetContent
 									};
 									dependencies.Insert(dependencyIndex, dependency);
@@ -383,7 +374,7 @@
 								else
 								{
 									throw new FileNotFoundException(
-										string.Format(CoreStrings.Common_FileNotExist, dependencyAssetPath));
+										string.Format(CoreStrings.Common_FileNotExist, dependencyAssetVirtualPath));
 								}
 							}
 							else
@@ -434,11 +425,11 @@
 		/// <summary>
 		/// Generates asset content cache item key
 		/// </summary>
-		/// <param name="assetPath">Path to asset file</param>
+		/// <param name="assetVirtualPath">Virtual path to asset file</param>
 		/// <returns>Asset content cache item key</returns>
-		private string GenerateAssetContentCacheItemKey(string assetPath)
+		private string GenerateAssetContentCacheItemKey(string assetVirtualPath)
 		{
-			string key = assetPath.Trim().ToUpperInvariant();
+			string key = assetVirtualPath.Trim().ToUpperInvariant();
 
 			return key;
 		}
@@ -446,11 +437,11 @@
 		/// <summary>
 		/// Gets text content of asset
 		/// </summary>
-		/// <param name="assetPath">Path to asset file</param>
+		/// <param name="assetVirtualPath">Virtual path to asset file</param>
 		/// <returns>Text content of asset</returns>
-		private string GetAssetFileTextContent(string assetPath)
+		private string GetAssetFileTextContent(string assetVirtualPath)
 		{
-			string key = GenerateAssetContentCacheItemKey(assetPath);
+			string key = GenerateAssetContentCacheItemKey(assetVirtualPath);
 			string assetContent;
 
 			if (_assetContentCache.ContainsKey(key))
@@ -459,7 +450,7 @@
 			}
 			else
 			{
-				assetContent = _fileSystemWrapper.GetFileTextContent(assetPath);
+				assetContent = _virtualFileSystemWrapper.GetFileTextContent(assetVirtualPath);
 				_assetContentCache.Add(key, assetContent);
 			}
 
@@ -469,11 +460,11 @@
 		/// <summary>
 		/// Determines whether the specified asset file exists
 		/// </summary>
-		/// <param name="assetPath">Path to asset file</param>
+		/// <param name="assetVirtualPath">Virtual path to asset file</param>
 		/// <returns>Result of checking (true – exist; false – not exist)</returns>
-		private bool AssetFileExists(string assetPath)
+		private bool AssetFileExists(string assetVirtualPath)
 		{
-			string key = GenerateAssetContentCacheItemKey(assetPath);
+			string key = GenerateAssetContentCacheItemKey(assetVirtualPath);
 			bool result;
 
 			if (_assetContentCache.ContainsKey(key))
@@ -482,7 +473,7 @@
 			}
 			else
 			{
-				result = _fileSystemWrapper.FileExists(assetPath);
+				result = _virtualFileSystemWrapper.FileExists(assetVirtualPath);
 			}
 
 			return result;

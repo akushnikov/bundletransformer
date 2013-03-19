@@ -164,7 +164,7 @@
 			{
 				throw new ArgumentException(CoreStrings.Common_ValueIsEmpty, "filePath");
 			}
-			
+
 			if (!File.Exists(filePath))
 			{
 				throw new FileNotFoundException(
@@ -208,7 +208,7 @@
 				if (dependentFilePaths != null)
 				{
 					dependentFilePaths.Add(filePath);
-					_platformAdaptationLayer.OnOpenInputFileStream = accessedFile => 
+					_platformAdaptationLayer.OnOpenInputFileStream = accessedFile =>
 					{
 						if (!accessedFile.Contains(".sass-cache"))
 						{

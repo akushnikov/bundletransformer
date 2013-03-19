@@ -160,8 +160,8 @@
 			{
 				var defaultLibDependency = new Dependency
 				{
-				    Url = "lib.d.ts", 
-					Path = "lib.d.ts", 
+				    Url = "lib.d.ts",
+					VirtualPath = "lib.d.ts", 
 					Content = _commonTypesDefinitions
 				};
 				newDependencies.Add(defaultLibDependency);
@@ -177,8 +177,8 @@
 					var result = _jsEngine.Evaluate<string>(
 						string.Format(COMPILATION_FUNCTION_CALL_TEMPLATE,
 							JsonConvert.SerializeObject(content),
-							JsonConvert.SerializeObject(newDependencies.Select(d => 
-								new { url = d.Url, path = d.Path, content = d.Content })), 
+							JsonConvert.SerializeObject(newDependencies.Select(d =>
+								new { url = d.Url, virtualPath = d.VirtualPath, content = d.Content })), 
 							optionsString));
 					var json = JObject.Parse(result);
 

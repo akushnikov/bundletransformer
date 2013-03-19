@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: CoffeeScript 1.6.24
+        README file for Bundle Transformer: CoffeeScript 1.7.0 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -16,12 +16,6 @@
    version 1.6.1). This adapter makes translation of CoffeeScript-code 
    to JS-code. Also contains HTTP-handler CoffeeScriptAssetHandler, which 
    is responsible for text output of translated CoffeeScript-asset.
-   
-   =============
-   RELEASE NOTES
-   =============
-   Added support of CoffeeScript version 1.6.1 (supports CoffeeScript 
-   Markdown-files).
 
    =============
    DOCUMENTATION

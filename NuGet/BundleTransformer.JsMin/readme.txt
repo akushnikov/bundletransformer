@@ -1,11 +1,11 @@
 
 
    ----------------------------------------------------------------------
-              README file for Bundle Transformer: JSMin 1.6.13
+           README file for Bundle Transformer: JSMin 1.7.0 Beta 1
  
    ----------------------------------------------------------------------
 
-          Copyright 2012 Andrey Taritsyn - http://www.taritsyn.ru
+          Copyright 2013 Andrey Taritsyn - http://www.taritsyn.ru
 
 
    ===========
