@@ -36,6 +36,89 @@
 			// Arrange
 			var virtualFileSystemMock = new Mock<IVirtualFileSystemWrapper>();
 
+
+			string colorsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Colors.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(colorsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialColorsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Colors.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialColorsSassAssetVirtualPath))
+				.Returns(true)
+				;
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(partialColorsSassAssetVirtualPath))
+				.Returns(@"$bg-color: #7AC0DA
+$border-color: green
+$caption-color: #FFFFFF
+$alt-bg-color: #CE4DD6")
+				;
+
+
+			string colorsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Colors.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(colorsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialColorsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Colors.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialColorsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string mixinsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Mixins.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(mixinsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialMixinsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Mixins.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialMixinsSassAssetVirtualPath))
+				.Returns(true)
+				;
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(partialMixinsSassAssetVirtualPath))
+				.Returns(@"// Border Radius
+@mixin border-radius($radius)
+	border-radius: $radius
+	-webkit-border-radius: $radius
+	-moz-border-radius: $radius
+
+// Visible
+@mixin visible
+	display: block")
+				;
+
+
+			string mixinsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Mixins.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(mixinsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+			string partialMixinsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Mixins.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialMixinsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+
 			string testSassImportSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH, 
 				"TestSassImport.sass");
 			virtualFileSystemMock
@@ -44,9 +127,7 @@
 				;
 			virtualFileSystemMock
 				.Setup(fs => fs.GetFileTextContent(testSassImportSassAssetVirtualPath))
-				.Returns(@"$alt-bg-color: #CE4DD6
-
-.translators #sass
+				.Returns(@".translators #sass
 	background-color: $alt-bg-color
 	border-color: $alt-bg-color
 
@@ -94,8 +175,7 @@
 				;
 			virtualFileSystemMock
 				.Setup(fs => fs.GetFileTextContent(testSassImportSub2SassAssetVirtualPath))
-				.Returns(@"$border-color: green
-
+				.Returns(@"
 .translators #sass
 	border-color: $border-color")
 				;
@@ -160,8 +240,8 @@
 			var sassAndScssTranslator = new SassAndScssTranslator(_httpContext, virtualFileSystemWrapper, 
 				_cssRelativePathResolver, _sassAndScssConfig);
 
-			const string assetContent = @"$bg-color: #7AC0DA
-$caption-color: #FFFFFF
+			const string assetContent = @"@import ""Colors""
+@import ""Mixins.sass""
 
 @mixin visible
 	display: block
@@ -179,7 +259,7 @@ $caption-color: #FFFFFF
 	color: $caption-color
 	font-weight: bold
 	border: 1px solid $bg-color
-	@include rounded-corners(5px)
+	@include border-radius(5px)
 
 @import ""TestSassImport.sass""";
 			string assetUrl = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH, "TestSass.sass");
@@ -189,12 +269,14 @@ $caption-color: #FFFFFF
 			sassAndScssTranslator.FillDependencies(assetContent, assetUrl, virtualPathDependencies);
 
 			// Assert
-			Assert.AreEqual(5, virtualPathDependencies.Count);
-			Assert.AreEqual(testSassImportSassAssetVirtualPath, virtualPathDependencies[0]);
-			Assert.AreEqual(testSassImportSub1SassAssetVirtualPath, virtualPathDependencies[1]);
-			Assert.AreEqual(testSassImportSub2SassAssetVirtualPath, virtualPathDependencies[2]);
-			Assert.AreEqual(testSassImportSub3SassAssetVirtualPath, virtualPathDependencies[3]);
-			Assert.AreEqual(testSassImportSub4ScssAssetVirtualPath, virtualPathDependencies[4]);
+			Assert.AreEqual(7, virtualPathDependencies.Count);
+			Assert.AreEqual(partialColorsSassAssetVirtualPath, virtualPathDependencies[0]);
+			Assert.AreEqual(partialMixinsSassAssetVirtualPath, virtualPathDependencies[1]);
+			Assert.AreEqual(testSassImportSassAssetVirtualPath, virtualPathDependencies[2]);
+			Assert.AreEqual(testSassImportSub1SassAssetVirtualPath, virtualPathDependencies[3]);
+			Assert.AreEqual(testSassImportSub2SassAssetVirtualPath, virtualPathDependencies[4]);
+			Assert.AreEqual(testSassImportSub3SassAssetVirtualPath, virtualPathDependencies[5]);
+			Assert.AreEqual(testSassImportSub4ScssAssetVirtualPath, virtualPathDependencies[6]);
 		}
 
 		[Test]
@@ -202,6 +284,93 @@ $caption-color: #FFFFFF
 		{
 			// Arrange
 			var virtualFileSystemMock = new Mock<IVirtualFileSystemWrapper>();
+
+
+			string colorsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Colors.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(colorsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialColorsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Colors.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialColorsScssAssetVirtualPath))
+				.Returns(true)
+				;
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(partialColorsScssAssetVirtualPath))
+				.Returns(@"$bg-color: #7AC0DA;
+$border-color: yellow;
+$caption-color: #FFFFFF;
+$alt-bg-color: #CE4DD6;")
+				;
+
+
+			string colorsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Colors.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(colorsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialColorsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Colors.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialColorsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string mixinsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Mixins.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(mixinsScssAssetVirtualPath))
+				.Returns(false)
+				;
+
+			string partialMixinsScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Mixins.scss");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialMixinsScssAssetVirtualPath))
+				.Returns(true)
+				;
+			virtualFileSystemMock
+				.Setup(fs => fs.GetFileTextContent(partialMixinsScssAssetVirtualPath))
+				.Returns(@"// Border Radius
+@mixin border-radius ($radius: 5px)
+{
+	border-radius: $radius;
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+}
+
+// Visible
+@mixin visible
+{
+	display: block;
+}")
+				;
+
+
+			string mixinsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"Mixins.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(mixinsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
+
+			string partialMixinsSassAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
+				"_Mixins.sass");
+			virtualFileSystemMock
+				.Setup(fs => fs.FileExists(partialMixinsSassAssetVirtualPath))
+				.Returns(false)
+				;
+
 
 			string testScssImportScssAssetVirtualPath = Utils.CombineUrls(STYLES_DIRECTORY_VIRTUAL_PATH,
 				"TestScssImport.scss");
@@ -211,9 +380,7 @@ $caption-color: #FFFFFF
 				;
 			virtualFileSystemMock
 				.Setup(fs => fs.GetFileTextContent(testScssImportScssAssetVirtualPath))
-				.Returns(@"$alt-bg-color: #CE4DD6;
-
-.translators #scss
+				.Returns(@".translators #scss
 {
 	background-color: $alt-bg-color;
 	border-color: $alt-bg-color;
@@ -265,8 +432,7 @@ $caption-color: #FFFFFF
 				;
 			virtualFileSystemMock
 				.Setup(fs => fs.GetFileTextContent(testScssImportSub2ScssAssetVirtualPath))
-				.Returns(@"$border-color: yellow;
-
+				.Returns(@"
 .translators #scss
 {
 	border-color: $border-color;
@@ -333,20 +499,8 @@ $caption-color: #FFFFFF
 			var sassAndScssTranslator = new SassAndScssTranslator(_httpContext, virtualFileSystemWrapper,
 				_cssRelativePathResolver, _sassAndScssConfig);
 
-			const string assetContent = @"$bg-color: #7AC0DA;
-$caption-color: #FFFFFF;
-
-@mixin visible
-{
-	display: block;
-}
-
-@mixin rounded-corners ($radius: 5px)
-{
-	border-radius: $radius;
-	-webkit-border-radius: $radius;
-	-moz-border-radius: $radius;
-}
+			const string assetContent = @"@import ""Colors"";
+@import ""Mixins.scss"";
 
 .translators #scss
 {
@@ -357,7 +511,7 @@ $caption-color: #FFFFFF;
 	color: $caption-color;
 	font-weight: bold;
 	border: 1px solid $bg-color;
-	@include rounded-corners(5px);
+	@include border-radius(5px);
 }
 
 @import ""TestScssImport.scss"";";
@@ -368,12 +522,14 @@ $caption-color: #FFFFFF;
 			sassAndScssTranslator.FillDependencies(assetContent, assetUrl, virtualPathDependencies);
 
 			// Assert
-			Assert.AreEqual(5, virtualPathDependencies.Count);
-			Assert.AreEqual(testScssImportScssAssetVirtualPath, virtualPathDependencies[0]);
-			Assert.AreEqual(testScssImportSub1ScssAssetVirtualPath, virtualPathDependencies[1]);
-			Assert.AreEqual(testScssImportSub2ScssAssetVirtualPath, virtualPathDependencies[2]);
-			Assert.AreEqual(testScssImportSub3ScssAssetVirtualPath, virtualPathDependencies[3]);
-			Assert.AreEqual(testScssImportSub4SassAssetVirtualPath, virtualPathDependencies[4]);
+			Assert.AreEqual(7, virtualPathDependencies.Count);
+			Assert.AreEqual(partialColorsScssAssetVirtualPath, virtualPathDependencies[0]);
+			Assert.AreEqual(partialMixinsScssAssetVirtualPath, virtualPathDependencies[1]);
+			Assert.AreEqual(testScssImportScssAssetVirtualPath, virtualPathDependencies[2]);
+			Assert.AreEqual(testScssImportSub1ScssAssetVirtualPath, virtualPathDependencies[3]);
+			Assert.AreEqual(testScssImportSub2ScssAssetVirtualPath, virtualPathDependencies[4]);
+			Assert.AreEqual(testScssImportSub3ScssAssetVirtualPath, virtualPathDependencies[5]);
+			Assert.AreEqual(testScssImportSub4SassAssetVirtualPath, virtualPathDependencies[6]);
 		}
 
 		[TestFixtureTearDown]

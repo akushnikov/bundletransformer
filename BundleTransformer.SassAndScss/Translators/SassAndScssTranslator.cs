@@ -250,18 +250,31 @@
 							string importedAssetUrl = _relativePathResolver.ResolveRelativePath(
 								assetUrl, url.Trim());
 							string importedAssetVirtualPath = importedAssetUrl;
-							string importedAssetExtension = Path.GetExtension(importedAssetUrl);
+							string importedAssetExtension = Path.GetExtension(importedAssetVirtualPath);
+							bool importedAssetExists;
+							string newImportedAssetVirtualPath;
 
 							if (string.Equals(importedAssetExtension, SASS_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase)
 								|| string.Equals(importedAssetExtension, SCSS_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
 							{
-								if (_virtualFileSystemWrapper.FileExists(importedAssetVirtualPath))
+								newImportedAssetVirtualPath = importedAssetVirtualPath;
+								importedAssetExists = _virtualFileSystemWrapper.FileExists(
+									newImportedAssetVirtualPath);
+
+								if (!importedAssetExists)
 								{
-									virtualPathDependencies.Add(importedAssetVirtualPath);
+									newImportedAssetVirtualPath = GetPartialAssetVirtualPath(newImportedAssetVirtualPath);
+									importedAssetExists = _virtualFileSystemWrapper.FileExists(
+										newImportedAssetVirtualPath);
+								}
+
+								if (importedAssetExists)
+								{
+									virtualPathDependencies.Add(newImportedAssetVirtualPath);
 
 									string importedAssetContent = _virtualFileSystemWrapper.GetFileTextContent(
-										importedAssetVirtualPath);
-									FillDependencies(importedAssetContent, importedAssetUrl, 
+										newImportedAssetVirtualPath);
+									FillDependencies(importedAssetContent, newImportedAssetVirtualPath, 
 										virtualPathDependencies);
 								}
 								else
@@ -273,42 +286,72 @@
 							else if (!string.Equals(importedAssetExtension, CSS_FILE_EXTENSION, 
 								StringComparison.InvariantCultureIgnoreCase))
 							{
-								importedAssetVirtualPath = importedAssetUrl;
-
 								string newImportedAssetExtension = assetExtension;
-								string newImportedAssetUrl = importedAssetUrl + newImportedAssetExtension;
-								string newImportedAssetVirtualPath = importedAssetVirtualPath + newImportedAssetExtension;
-								bool newImportedAssetExists = _virtualFileSystemWrapper.FileExists(newImportedAssetVirtualPath);
+								newImportedAssetVirtualPath = importedAssetVirtualPath +
+									newImportedAssetExtension;
+								importedAssetExists = _virtualFileSystemWrapper.FileExists(
+									newImportedAssetVirtualPath);
 
-								if (!newImportedAssetExists)
+								if (!importedAssetExists)
 								{
-									newImportedAssetExtension = string.Equals(newImportedAssetExtension, SASS_FILE_EXTENSION,
-										StringComparison.InvariantCultureIgnoreCase) ? SCSS_FILE_EXTENSION : SASS_FILE_EXTENSION;
-									newImportedAssetUrl = importedAssetUrl + newImportedAssetExtension;
-									newImportedAssetVirtualPath = importedAssetVirtualPath + newImportedAssetExtension;
-
-									newImportedAssetExists = _virtualFileSystemWrapper.FileExists(newImportedAssetVirtualPath);
+									newImportedAssetVirtualPath = GetPartialAssetVirtualPath(newImportedAssetVirtualPath);
+									importedAssetExists = _virtualFileSystemWrapper.FileExists(
+										newImportedAssetVirtualPath);
 								}
 
-								if (newImportedAssetExists)
+								if (!importedAssetExists)
+								{
+									newImportedAssetExtension = string.Equals(newImportedAssetExtension, 
+										SASS_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase) ? 
+											SCSS_FILE_EXTENSION : SASS_FILE_EXTENSION;
+									newImportedAssetVirtualPath = importedAssetVirtualPath + 
+										newImportedAssetExtension;
+
+									importedAssetExists = _virtualFileSystemWrapper.FileExists(
+										newImportedAssetVirtualPath);
+								}
+
+								if (!importedAssetExists)
+								{
+									newImportedAssetVirtualPath = GetPartialAssetVirtualPath(newImportedAssetVirtualPath);
+									importedAssetExists = _virtualFileSystemWrapper.FileExists(
+										newImportedAssetVirtualPath);
+								}
+
+								if (importedAssetExists)
 								{
 									virtualPathDependencies.Add(newImportedAssetVirtualPath);
 
 									string importedAssetContent = _virtualFileSystemWrapper.GetFileTextContent(
 										newImportedAssetVirtualPath);
-									FillDependencies(importedAssetContent, newImportedAssetUrl,
+									FillDependencies(importedAssetContent, newImportedAssetVirtualPath,
 										virtualPathDependencies);
 								}
 								else
 								{
 									throw new FileNotFoundException(
-										string.Format(Strings.Common_FileNotExist, newImportedAssetVirtualPath));
+										string.Format(Strings.Common_FileNotExist, importedAssetVirtualPath));
 								}
 							}	
 						}
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets a partial asset virtual path
+		/// </summary>
+		/// <param name="assetVirtualPath">Virtual path of asset file</param>
+		/// <returns>Virtual path of partial asset file</returns>
+		private static string GetPartialAssetVirtualPath(string assetVirtualPath)
+		{
+			string partialAssetVirtualPath = Utils.CombineUrls(
+				Utils.ProcessBackSlashesInUrl(Path.GetDirectoryName(assetVirtualPath)),
+				"_" + Path.GetFileName(assetVirtualPath)
+			);
+
+			return partialAssetVirtualPath;
 		}
 	}
 }
