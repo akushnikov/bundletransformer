@@ -78,7 +78,7 @@
 			bundles.Add(jqueryUiStylesDirectoryBundle);
 
 			var scriptsDirectoryBundle = new Bundle("~/Bundles/ScriptsDirectory");
-			scriptsDirectoryBundle.IncludeDirectory("~/Scripts/", "*.js");
+			scriptsDirectoryBundle.IncludeDirectory("~/Scripts/", "*.js", true);
 			scriptsDirectoryBundle.Transforms.Add(new JsTransformer(
 				new[] { "*.all.js", "references.js" }));
 

@@ -84,6 +84,13 @@
 			RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		/// <summary>
+		/// Regular expression to determine whether
+		/// asset is Handlebars template-file based on its extension
+		/// </summary>
+		private static readonly Regex _handlebarsFileExtensionRegex = new Regex(@"\.handlebars$|\.hbs$",
+			RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+		/// <summary>
 		/// Regular expression to determine whether asset is 
 		/// minified version of CSS-file with *.min.css extension
 		/// </summary>
@@ -204,7 +211,8 @@
 					|| assetType == AssetType.CoffeeScript
 					|| assetType == AssetType.LiterateCoffeeScript
 					|| assetType == AssetType.CoffeeScriptMarkdown
-					|| assetType == AssetType.TypeScript);
+					|| assetType == AssetType.TypeScript
+					|| assetType == AssetType.Handlebars);
 			}
 		}
 
@@ -286,6 +294,10 @@
 			else if (_tsFileExtensionRegex.IsMatch(assetVirtualPath))
 			{
 				assetType = AssetType.TypeScript;
+			}
+			else if (_handlebarsFileExtensionRegex.IsMatch(assetVirtualPath))
+			{
+				assetType = AssetType.Handlebars;
 			}
 
 			return assetType;

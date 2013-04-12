@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: Core 1.7.0 Beta 1
+           README file for Bundle Transformer: Core 1.7.3 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -38,8 +38,7 @@
    =============
    RELEASE NOTES
    =============
-   Added support of Microsoft ASP.NET Web Optimization Framework 
-   1.1.0 Beta 1.
+   Fixed bug #28 "Bugfix for 1.7.0-Beta1 with IncludeVirtualPath".
 
    =============
    DOCUMENTATION

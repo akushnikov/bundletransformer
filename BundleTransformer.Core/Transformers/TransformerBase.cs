@@ -86,7 +86,7 @@
 
 				foreach (var bundleFile in bundleFiles)
 				{
-					assets.Add(new Asset(bundleFile.IncludedVirtualPath));
+					assets.Add(new Asset(bundleFile.VirtualFile.VirtualPath));
 				}
 
 				Transform(assets, response, BundleTable.VirtualPathProvider, context.HttpContext);

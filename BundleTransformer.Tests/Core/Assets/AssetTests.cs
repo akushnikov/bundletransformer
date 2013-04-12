@@ -79,6 +79,12 @@
 			var testTsAsset = new Asset(Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, "TestTypeScript.ts"), 
 				_virtualFileSystemWrapper);
 
+			var testHandlebarsAsset = new Asset(Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, "TestHandlebars.handlebars"),
+				_virtualFileSystemWrapper);
+
+			var testShortHandlebarsAsset = new Asset(Utils.CombineUrls(SCRIPTS_DIRECTORY_VIRTUAL_PATH, "TestShortHandlebars.hbs"),
+				_virtualFileSystemWrapper);
+
 			var testPlainTextAsset = new Asset(Utils.CombineUrls(APPLICATION_ROOT_VIRTUAL_PATH, "TestPlainText.txt"),
 				_virtualFileSystemWrapper);
 
@@ -92,6 +98,8 @@
 			Assert.AreEqual(AssetType.LiterateCoffeeScript, testLitCoffeeAsset.AssetType);
 			Assert.AreEqual(AssetType.CoffeeScriptMarkdown, testCoffeeMdAsset.AssetType);
 			Assert.AreEqual(AssetType.TypeScript, testTsAsset.AssetType);
+			Assert.AreEqual(AssetType.Handlebars, testHandlebarsAsset.AssetType);
+			Assert.AreEqual(AssetType.Handlebars, testShortHandlebarsAsset.AssetType);
 			Assert.AreEqual(AssetType.Unknown, testPlainTextAsset.AssetType);
 
 			Assert.AreEqual(siteCssAsset.IsStylesheet, true);
@@ -112,6 +120,10 @@
 			Assert.AreEqual(testCoffeeMdAsset.IsScript, true);
 			Assert.AreEqual(testTsAsset.IsStylesheet, false);
 			Assert.AreEqual(testTsAsset.IsScript, true);
+			Assert.AreEqual(testHandlebarsAsset.IsStylesheet, false);
+			Assert.AreEqual(testHandlebarsAsset.IsScript, true);
+			Assert.AreEqual(testShortHandlebarsAsset.IsStylesheet, false);
+			Assert.AreEqual(testShortHandlebarsAsset.IsScript, true);
 			Assert.AreEqual(testPlainTextAsset.IsStylesheet, false);
 			Assert.AreEqual(testPlainTextAsset.IsScript, false);
 		}
