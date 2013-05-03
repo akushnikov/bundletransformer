@@ -9,6 +9,7 @@
 	using Newtonsoft.Json.Linq;
 
 	using Core;
+	using Core.SourceCodeHelpers;
 	using CoreStrings = Core.Resources.Strings;
 
 	/// <summary>
@@ -109,7 +110,7 @@
 					var errors = json["errors"] != null ? json["errors"] as JArray : null;
 					if (errors != null && errors.Count > 0)
 					{
-						throw new CoffeeScriptCompilingException(FormatErrorDetails(errors[0]));
+						throw new CoffeeScriptCompilingException(FormatErrorDetails(errors[0], content));
 					}
 
 					newContent = json.Value<string>("compiledCode");
@@ -128,12 +129,15 @@
 		/// Generates a detailed error message
 		/// </summary>
 		/// <param name="errorDetails">Error details</param>
+		/// <param name="sourceCode">Source code</param>
 		/// <returns>Detailed error message</returns>
-		private static string FormatErrorDetails(JToken errorDetails)
+		private static string FormatErrorDetails(JToken errorDetails, string sourceCode)
 		{
 			var message = errorDetails.Value<string>("message");
 			var lineNumber = errorDetails.Value<int>("lineNumber");
 			var columnNumber = errorDetails.Value<int>("columnNumber");
+			string sourceFragment = SourceCodeNavigator.GetSourceFragment(sourceCode, 
+				new SourceCodeNodeCoordinates(lineNumber, columnNumber));
 
 			var errorMessage = new StringBuilder();
 			errorMessage.AppendFormatLine("{0}: {1}", CoreStrings.ErrorDetails_Message, message);
@@ -146,6 +150,11 @@
 			{
 				errorMessage.AppendFormatLine("{0}: {1}", CoreStrings.ErrorDetails_ColumnNumber,
 					columnNumber.ToString());
+			}
+			if (!string.IsNullOrWhiteSpace(sourceFragment))
+			{
+				errorMessage.AppendFormatLine("{1}:{0}{0}{2}", Environment.NewLine,
+					CoreStrings.ErrorDetails_SourceError, sourceFragment);
 			}
 
 			return errorMessage.ToString();

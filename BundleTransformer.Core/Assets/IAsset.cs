@@ -57,10 +57,5 @@
 		/// Gets a flag indicating what asset is a script
 		/// </summary>
 		bool IsScript { get; }
-
-		/// <summary>
-		/// Reads text content from asset file
-		/// </summary>
-		void RefreshContent();
 	}
 }

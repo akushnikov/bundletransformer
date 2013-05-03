@@ -10,6 +10,7 @@
 	using FileSystem;
 	using Minifiers;
 	using Resources;
+	using Transformers;
 	using Translators;
 	using Web;
 
@@ -25,10 +26,22 @@
 			new Lazy<BundleTransformerContext>(() => new BundleTransformerContext());
 
 		/// <summary>
+		/// Instance of CSS-transformer
+		/// </summary>
+		private readonly Lazy<CssTransformer> _cssTransformer =
+			new Lazy<CssTransformer>();
+
+		/// <summary>
+		/// Instance of JS-transformer
+		/// </summary>
+		private readonly Lazy<JsTransformer> _jsTransformer =
+			new Lazy<JsTransformer>();
+
+		/// <summary>
 		/// Information about web application
 		/// </summary>
 		private readonly Lazy<HttpApplicationInfo> _applicationInfo =
-			new Lazy<HttpApplicationInfo>(() => new HttpApplicationInfo());
+			new Lazy<HttpApplicationInfo>();
 
 		/// <summary>
 		/// Virtual file system wrapper 
@@ -128,6 +141,24 @@
 		private BundleTransformerContext()
 		{ }
 
+
+		/// <summary>
+		/// Gets instance of CSS-transformer
+		/// </summary>
+		/// <returns>Instance of CSS-transformer</returns>
+		public CssTransformer GetCssTransformerInstance()
+		{
+			return _cssTransformer.Value;
+		}
+
+		/// <summary>
+		/// Gets instance of JS-transformer
+		/// </summary>
+		/// <returns>Instance of JS-transformer</returns>
+		public JsTransformer GetJsTransformerInstance()
+		{
+			return _jsTransformer.Value;
+		}
 
 		/// <summary>
 		/// Gets instance of the web application info

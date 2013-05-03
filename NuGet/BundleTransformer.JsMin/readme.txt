@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: JSMin 1.7.0 Beta 1
+           README file for Bundle Transformer: JSMin 1.7.7 Beta 1
  
    ----------------------------------------------------------------------
 

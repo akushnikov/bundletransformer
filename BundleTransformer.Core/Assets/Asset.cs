@@ -2,6 +2,7 @@
 {
 	using System.Collections.Generic;
 	using System.Text.RegularExpressions;
+	using System.Web.Optimization;
 
 	using FileSystem;
 
@@ -122,6 +123,16 @@
 		private string _content;
 
 		/// <summary>
+		/// List of asset transformations
+		/// </summary>
+		private readonly IList<IItemTransform> _transforms;
+
+		/// <summary>
+		/// Included virtual path
+		/// </summary>
+		private readonly string _includedVirtualPath;
+
+		/// <summary>
 		/// Gets or sets a virtual path to asset file
 		/// </summary>
 		public string VirtualPath
@@ -174,7 +185,10 @@
 			{
 				if (_content == null)
 				{
-					RefreshContent();
+					string content = _virtualFileSystemWrapper.GetFileTextContent(VirtualPath);
+					content = ApplyTransformsToContent(content);
+
+					_content = content;
 				}
 
 				return _content;
@@ -222,7 +236,8 @@
 		/// </summary>
 		/// <param name="virtualPath">Virtual path to asset file</param>
 		public Asset(string virtualPath)
-			: this(virtualPath, BundleTransformerContext.Current.GetVirtualFileSystemWrapper())
+			: this(virtualPath, string.Empty, null, 
+				BundleTransformerContext.Current.GetVirtualFileSystemWrapper())
 		{ }
 
 		/// <summary>
@@ -231,7 +246,32 @@
 		/// <param name="virtualPath">Virtual path to asset file</param>
 		/// <param name="virtualFileSystemWrapper">file system wrapper</param>
 		public Asset(string virtualPath, IVirtualFileSystemWrapper virtualFileSystemWrapper)
+			: this(virtualPath, string.Empty, null, virtualFileSystemWrapper)
+		{ }
+
+		/// <summary>
+		/// Constructs instance of Asset
+		/// </summary>
+		/// <param name="virtualPath">Virtual path to asset file</param>
+		/// <param name="includedVirtualPath">Included virtual path</param>
+		/// <param name="transforms">List of asset transformations</param>
+		public Asset(string virtualPath, string includedVirtualPath, IList<IItemTransform> transforms)
+			: this(virtualPath, includedVirtualPath, transforms, 
+				BundleTransformerContext.Current.GetVirtualFileSystemWrapper())
+		{ }
+
+		/// <summary>
+		/// Constructs instance of Asset
+		/// </summary>
+		/// <param name="virtualPath">Virtual path to asset file</param>
+		/// <param name="includedVirtualPath">Included virtual path</param>
+		/// <param name="transforms">List of asset transformations</param>
+		/// <param name="virtualFileSystemWrapper">file system wrapper</param>
+		public Asset(string virtualPath, string includedVirtualPath, IList<IItemTransform> transforms, 
+			IVirtualFileSystemWrapper virtualFileSystemWrapper)
 		{
+			_includedVirtualPath = includedVirtualPath;
+			_transforms = transforms ?? new List<IItemTransform>();
 			_virtualFileSystemWrapper = virtualFileSystemWrapper;
 
 			VirtualPath = virtualPath;
@@ -241,13 +281,24 @@
 			AssetType = GetAssetType(virtualPath);
 		}
 
-
 		/// <summary>
-		/// Reads text content from asset file
+		/// Applies a transformations to asset content
 		/// </summary>
-		public void RefreshContent()
+		/// <param name="content">Asset content</param>
+		/// <returns>Processed asset content </returns>
+		private string ApplyTransformsToContent(string content)
 		{
-			_content = _virtualFileSystemWrapper.GetFileTextContent(VirtualPath);
+			string newContent = content;
+
+			if (_transforms.Count > 0)
+			{
+				foreach (IItemTransform transform in _transforms)
+				{
+					newContent = transform.Process(_includedVirtualPath, newContent);
+				}
+			}
+
+			return newContent;
 		}
 
 		/// <summary>

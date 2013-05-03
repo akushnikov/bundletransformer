@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-         README file for Bundle Transformer: WebGrease 1.7.0 Alpha
+         README file for Bundle Transformer: WebGrease 1.7.7 Alpha
  
    ----------------------------------------------------------------------
 
