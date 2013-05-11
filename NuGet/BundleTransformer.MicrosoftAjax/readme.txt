@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-      README file for Bundle Transformer: Microsoft Ajax 1.7.7 Beta 1
+      README file for Bundle Transformer: Microsoft Ajax 1.7.8 Beta 1
  
    ----------------------------------------------------------------------
 
@@ -27,6 +27,11 @@
    \configuration\bundleTransformer\core\css must be set value equal to 
    MicrosoftAjaxCssMinifier, and in same attribute of element 
    \configuration\bundleTransformer\core\js - MicrosoftAjaxJsMinifier.
+   
+   =============
+   RELEASE NOTES
+   =============
+   Added support of the Microsoft Ajax Minifier version 4.91.
    
    =============
    DOCUMENTATION
