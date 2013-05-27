@@ -14,7 +14,7 @@
    BundleTransformer.UglifyJs contains one minifier-adapter for 
    minification of JS-code - UglifyJsMinifier. UglifyJsMinifier is based 
    on the Mihai Bazon's UglifyJS (http://github.com/mishoo/UglifyJS2) 
-   version 2.3.3.
+   version 2.3.6.
    
    ====================
    POST-INSTALL ACTIONS

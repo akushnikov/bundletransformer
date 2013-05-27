@@ -10,9 +10,9 @@
     <projectUrl>http://bundletransformer.codeplex.com/</projectUrl>
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=bundletransformer&amp;DownloadId=476857</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>BundleTransformer.UglifyJs contains one minifier-adapter for minification of JS-code - UglifyJsMinifier. UglifyJsMinifier is based on the Mihai Bazon's UglifyJS (http://github.com/mishoo/UglifyJS2) version 2.3.3.</description>
-    <summary>BundleTransformer.UglifyJs contains one minifier-adapter for minification of JS-code - UglifyJsMinifier. UglifyJsMinifier is based on the Mihai Bazon's UglifyJS version 2.3.3.</summary>
-	<releaseNotes>Added support of UglifyJS version 2.3.3.</releaseNotes>
+    <description>BundleTransformer.UglifyJs contains one minifier-adapter for minification of JS-code - UglifyJsMinifier. UglifyJsMinifier is based on the Mihai Bazon's UglifyJS (http://github.com/mishoo/UglifyJS2) version 2.3.6.</description>
+    <summary>BundleTransformer.UglifyJs contains one minifier-adapter for minification of JS-code - UglifyJsMinifier. UglifyJsMinifier is based on the Mihai Bazon's UglifyJS version 2.3.6.</summary>
+	<releaseNotes>Added support of UglifyJS version 2.3.6.</releaseNotes>
 	<copyright>Copyright 2013 Andrey Taritsyn - http://www.taritsyn.ru</copyright>
     <language>en-US</language>
     <tags>System.Web.Optimization IBundleTransform ASP.NET JavaScript JS Bundling Minification Minifier Minify UglifyJS</tags>

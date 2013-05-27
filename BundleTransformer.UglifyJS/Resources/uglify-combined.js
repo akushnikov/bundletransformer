@@ -1,5 +1,5 @@
 /*!
- * UglifyJS v2.3.3
+ * UglifyJS v2.3.6
  * http://github.com/mishoo/UglifyJS2
  *
  * Copyright 2012-2013, Mihai Bazon <mihai.bazon@gmail.com>
@@ -214,6 +214,13 @@
 			compareTo(words);
 		}
 		return new Function("str", f);
+	};
+
+	function all(array, predicate) {
+		for (var i = array.length; --i >= 0;)
+			if (!predicate(array[i]))
+				return false;
+		return true;
 	};
 
 	function Dictionary() {
@@ -1753,9 +1760,10 @@
 	function parse($TEXT, options) {
 
 		options = defaults(options, {
-			strict   : false,
-			filename : null,
-			toplevel : null
+			strict     : false,
+			filename   : null,
+			toplevel   : null,
+			expression : false
 		});
 
 		var S = {
@@ -2551,6 +2559,10 @@
 			return ret;
 		};
 
+		if (options.expression) {
+			return expression(true);
+		}
+
 		return (function(){
 			var start = S.token;
 			var body = [];
@@ -2896,6 +2908,7 @@
 					} else {
 						g = new SymbolDef(self, globals.size(), node);
 						g.undeclared = true;
+						g.global = true;
 						globals.set(name, g);
 					}
 					node.thedef = g;
@@ -3309,7 +3322,8 @@
 			bracketize    : false,
 			semicolons    : true,
 			comments      : false,
-			preserve_line : false
+			preserve_line : false,
+			negate_iife   : !(options && options.beautify)
 		}, true);
 
 		var indentation = 0;
@@ -3433,7 +3447,7 @@
 				}
 				might_need_space = false;
 			}
-			
+
 			var a = str.split(/\r?\n/), len = a.length;
 			if (len > 0) {			
 				var n = len - 1;
@@ -3605,7 +3619,7 @@
 			var self = this, generator = self._codegen;
 			stream.push_node(self);
 			var needs_parens = self.needs_parens(stream);
-			var fc = self instanceof AST_Function && !stream.option("beautify");
+			var fc = self instanceof AST_Function && stream.option("negate_iife");
 			if (force_parens || (needs_parens && !fc)) {
 				stream.with_parens(function(){
 					self.add_comments(stream);
@@ -4375,7 +4389,7 @@
 				if (p instanceof AST_Statement && p.body === node)
 					return true;
 				if ((p instanceof AST_Seq           && p.car === node        ) ||
-					(p instanceof AST_Call          && p.expression === node ) ||
+					(p instanceof AST_Call          && p.expression === node && !(p instanceof AST_New) ) ||
 					(p instanceof AST_Dot           && p.expression === node ) ||
 					(p instanceof AST_Sub           && p.expression === node ) ||
 					(p instanceof AST_Conditional   && p.condition === node  ) ||
@@ -6031,7 +6045,7 @@
 							right: make_node(AST_String, self, { value: "" })
 						});
 					  case "Function":
-						if (self.args[self.args.length - 1] instanceof AST_String) {
+						if (all(self.args, function(x){ return x instanceof AST_String })) {
 							// quite a corner-case, but we can handle it:
 							//   https://github.com/mishoo/UglifyJS2/issues/203
 							// if the code argument is a constant, then we can minify it.
