@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: LESS 1.7.7 Beta 1
+           README file for Bundle Transformer: LESS 1.7.9 Beta 1
 
    ----------------------------------------------------------------------
 

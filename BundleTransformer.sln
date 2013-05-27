@@ -24,8 +24,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.JsMin", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.LessLite", "BundleTransformer.LessLite\BundleTransformer.LessLite.csproj", "{8B1E4598-9E2E-4C62-ABCF-E8D6107301C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.UglifyJs", "BundleTransformer.UglifyJS\BundleTransformer.UglifyJs.csproj", "{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.Example.Mvc", "BundleTransformer.Example.Mvc\BundleTransformer.Example.Mvc.csproj", "{22433A9D-93D7-4C11-8540-A79A05BDCF63}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.WG", "BundleTransformer.WG\BundleTransformer.WG.csproj", "{43801A25-27D6-42C6-B56C-BAD8172226F6}"
@@ -39,6 +37,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.SassAndScss", "BundleTransformer.SassAndScss\BundleTransformer.SassAndScss.csproj", "{E708475F-094D-4065-B432-473D76B739E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.Csso", "BundleTransformer.Csso\BundleTransformer.Csso.csproj", "{E70F938E-7498-4904-8E89-445DE42D974B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BundleTransformer.UglifyJs", "BundleTransformer.UglifyJs\BundleTransformer.UglifyJs.csproj", "{B8C2B00A-5703-475E-8D80-F353673B60A6}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -153,18 +153,6 @@ Global
 		{8B1E4598-9E2E-4C62-ABCF-E8D6107301C9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8B1E4598-9E2E-4C62-ABCF-E8D6107301C9}.Release|x64.ActiveCfg = Release|Any CPU
 		{8B1E4598-9E2E-4C62-ABCF-E8D6107301C9}.Release|x86.ActiveCfg = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|x64.ActiveCfg = Release|Any CPU
-		{3EB2ABE8-90D6-4EB7-A66B-F871EFCD6FF6}.Release|x86.ActiveCfg = Release|Any CPU
 		{22433A9D-93D7-4C11-8540-A79A05BDCF63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22433A9D-93D7-4C11-8540-A79A05BDCF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22433A9D-93D7-4C11-8540-A79A05BDCF63}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -253,6 +241,18 @@ Global
 		{E70F938E-7498-4904-8E89-445DE42D974B}.Release|x64.Build.0 = Release|x64
 		{E70F938E-7498-4904-8E89-445DE42D974B}.Release|x86.ActiveCfg = Release|x86
 		{E70F938E-7498-4904-8E89-445DE42D974B}.Release|x86.Build.0 = Release|x86
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|x64.ActiveCfg = Release|Any CPU
+		{B8C2B00A-5703-475E-8D80-F353673B60A6}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

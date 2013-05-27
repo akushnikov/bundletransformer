@@ -64,16 +64,16 @@
 		private readonly Hashtable _assetContentCache;
 
 		/// <summary>
-		/// Gets or sets settings of code stylization
+		/// Gets or sets a options of code stylization
 		/// </summary>
-		public StyleInstanceSettings StyleSettings
+		public StyleOptions StyleOptions
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// Gets or sets a flag for whether to include a default lib.d.ts with global declarations
+		/// Gets or sets a flag for whether to include a default <code>lib.d.ts</code> with global declarations
 		/// </summary>
 		public bool UseDefaultLib
 		{
@@ -100,7 +100,8 @@
 		}
 
 		/// <summary>
-		/// Gets or sets a flag for whether to infer class properties from top-level assignments to 'this'
+		/// Gets or sets a flag for whether to infer class properties
+		/// from top-level assignments to <code>this</code>
 		/// </summary>
 		public bool InferPropertiesFromThisAssignment
 		{
@@ -142,7 +143,7 @@
 
 			StyleSettings styleConfig = tsConfig.Style;
 
-			StyleSettings = new StyleInstanceSettings
+			StyleOptions = new StyleOptions
 			{
 				Bitwise = styleConfig.Bitwise,
 				BlockInCompoundStatement = styleConfig.BlockInCompoundStatement,
@@ -182,8 +183,8 @@
 			}
 
 			bool enableNativeMinification = NativeMinificationEnabled;
-			var options = GenerateTypeScriptCompilationOptions(enableNativeMinification);
-			var typeScriptCompiler = new TypeScriptCompiler(UseDefaultLib, options);
+			CompilationOptions options = CreateCompilationOptions(enableNativeMinification);
+			var typeScriptCompiler = new TypeScriptCompiler(options);
 
 			try
 			{
@@ -222,8 +223,8 @@
 			}
 
 			bool enableNativeMinification = NativeMinificationEnabled;
-			var options = GenerateTypeScriptCompilationOptions(enableNativeMinification);
-			var typeScriptCompiler = new TypeScriptCompiler(UseDefaultLib, options);
+			CompilationOptions options = CreateCompilationOptions(enableNativeMinification);
+			var typeScriptCompiler = new TypeScriptCompiler(options);
 
 			try
 			{
@@ -279,38 +280,21 @@
 		}
 
 		/// <summary>
-		/// Generates a TypeScript compilation options
+		/// Creates a compilation options
 		/// </summary>
 		/// <param name="enableNativeMinification">Flag that indicating to use of native minification</param>
-		/// <returns>TypeScript compilation options</returns>
-		private object GenerateTypeScriptCompilationOptions(bool enableNativeMinification)
+		/// <returns>Compilation options</returns>
+		private CompilationOptions CreateCompilationOptions(bool enableNativeMinification)
 		{
-			var options = new
+			var options = new CompilationOptions
 			{
-			    styleSettings = new
-			    {
-					bitwise = StyleSettings.Bitwise,
-					blockInCompoundStmt = StyleSettings.BlockInCompoundStatement,
-					eqeqeq = StyleSettings.EqEqEq,
-					forin = StyleSettings.ForIn,
-					emptyBlocks = StyleSettings.EmptyBlocks,
-					newMustBeUsed = StyleSettings.NewMustBeUsed,
-					requireSemi = StyleSettings.RequireSemicolons,
-					assignmentInCond = StyleSettings.AssignmentInConditions,
-					eqnull = StyleSettings.EqNull,
-					evalOK = StyleSettings.EvalOk,
-					innerScopeDeclEscape = StyleSettings.InnerScopeDeclarationsEscape,
-					funcInLoop = StyleSettings.FunctionsInLoops,
-					reDeclareLocal = StyleSettings.ReDeclareLocal,
-					literalSubscript = StyleSettings.LiteralSubscript,
-					implicitAny = StyleSettings.ImplicitAny
-			    },
-			    propagateConstants = PropagateConstants,
-			    minWhitespace = enableNativeMinification,
-			    emitComments = !enableNativeMinification,
-				errorOnWith = ErrorOnWith,
-				inferPropertiesFromThisAssignment = InferPropertiesFromThisAssignment,
-				codeGenTarget = CodeGenTarget.ToString()
+				StyleOptions = StyleOptions,
+				UseDefaultLib = UseDefaultLib,
+				PropagateConstants = PropagateConstants,
+				EnableNativeMinification = enableNativeMinification,
+				ErrorOnWith = ErrorOnWith,
+				InferPropertiesFromThisAssignment = InferPropertiesFromThisAssignment,
+				CodeGenTarget = CodeGenTarget
 			};
 
 			return options;
@@ -403,8 +387,7 @@
 		{
 			var urlInUpperCase = url.ToUpperInvariant();
 			var dependency = dependencies
-				.Where(d => d.Url.ToUpperInvariant() == urlInUpperCase)
-				.SingleOrDefault()
+				.SingleOrDefault(d => d.Url.ToUpperInvariant() == urlInUpperCase)
 				;
 
 			return dependency;

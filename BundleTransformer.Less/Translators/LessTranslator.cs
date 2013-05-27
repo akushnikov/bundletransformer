@@ -60,7 +60,7 @@
 		/// Constructs instance of LESS-translator
 		/// </summary>
 		public LessTranslator()
-			: this(BundleTransformerContext.Current.GetCssRelativePathResolver(),
+			: this(BundleTransformerContext.Current.GetCommonRelativePathResolver(),
 				BundleTransformerContext.Current.GetLessConfiguration())
 		{ }
 

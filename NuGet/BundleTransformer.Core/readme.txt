@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: Core 1.7.7 Beta 1
+           README file for Bundle Transformer: Core 1.7.9 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -34,24 +34,6 @@
 
    This extension will help your web applications successfully pass a 
    most part of the tests in YSlow.
-   
-   =============
-   RELEASE NOTES
-   =============
-   1. Added support of the item transformations (classes that 
-      implements an IItemTransform interface);
-   2. Added the NullBuilder class (implements an IBundleBuilder interface)
-      that responsible for prevention of early applying of the item 
-      transformations and combining of code;
-   3. Implemented analogs of the StyleBundle and ScriptBundle classes 
-      for the Bundle Transformer: CustomStyleBundle (uses 
-      CssTransformer as transformation by default and NullBuilder as 
-      builder by default) and CustomScriptBundle (uses JsTransformer as 
-      transformation by default and NullBuilder as builder by default);
-   4. In the css configuration element added the 
-      disableNativeCssRelativePathTransformation attribute, which 
-      disables native transformation of relative paths to absolute 
-      in CSS-files.
 
    =============
    DOCUMENTATION
