@@ -5504,10 +5504,10 @@ var CoffeeScript = (function(){
 //				noReplace: true
 //			  });
 //			}
-			newLines = helpers.count(fragment.code, "\n");
-			currentLine += newLines;
-			currentColumn = fragment.code.length - (newLines ? fragment.code.lastIndexOf("\n") : 0);
-		  }
+//			newLines = helpers.count(fragment.code, "\n");
+//			currentLine += newLines;
+//			currentColumn = fragment.code.length - (newLines ? fragment.code.lastIndexOf("\n") : 0);
+//		  }
 		  js += fragment.code;
 		}
 //		if (options.header) {
