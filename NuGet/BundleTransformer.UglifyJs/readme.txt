@@ -27,7 +27,7 @@
    =============
    RELEASE NOTES
    =============
-   Added support of UglifyJS version 2.3.3.
+   Added support of UglifyJS version 2.3.6.
    
    =============
    DOCUMENTATION

@@ -34,7 +34,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>BundleTransformer.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\BundleTransformer.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MsieJavaScriptEngine">
@@ -81,7 +81,9 @@
     <Compile Include="Uglifiers\JsUglifyingException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="BundleTransformer.snk" />
+    <None Include="..\BundleTransformer.snk">
+      <Link>BundleTransformer.snk</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
