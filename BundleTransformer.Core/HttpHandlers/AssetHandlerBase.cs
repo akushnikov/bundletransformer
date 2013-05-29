@@ -1,6 +1,7 @@
 ﻿namespace BundleTransformer.Core.HttpHandlers
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Web;
@@ -189,6 +190,7 @@
 				{
 					IAsset processedAsset = ProcessAsset(asset);
 					content = processedAsset.Content;
+					string assetVirtualPath = processedAsset.VirtualPath;
 					DateTime utcStart = DateTime.UtcNow;
 
 					DateTime absoluteExpiration;
@@ -204,8 +206,11 @@
 						slidingExpiration = Cache.NoSlidingExpiration;
 					}
 
-					var cacheDep = _virtualFileSystemWrapper.GetCacheDependency(processedAsset.VirtualPath,
-						processedAsset.VirtualPathDependencies.ToArray(), utcStart);
+					var fileDependencies = new List<string> { assetVirtualPath };
+					fileDependencies.AddRange(processedAsset.VirtualPathDependencies);
+
+					var cacheDep = _virtualFileSystemWrapper.GetCacheDependency(assetVirtualPath,
+						fileDependencies.ToArray(), utcStart);
 
 					_cache.Insert(cacheItemKey, content, cacheDep,
 						absoluteExpiration, slidingExpiration, CacheItemPriority.Low, null);

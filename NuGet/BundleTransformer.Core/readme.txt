@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-           README file for Bundle Transformer: Core 1.7.9 Beta 1
+           README file for Bundle Transformer: Core 1.7.11 Beta 1
 
    ----------------------------------------------------------------------
 
@@ -34,6 +34,12 @@
 
    This extension will help your web applications successfully pass a 
    most part of the tests in YSlow.
+   
+   =============
+   RELEASE NOTES
+   =============
+   Fixed a bug in the base HTTP handler, which can cause to incorrect 
+   working of server cache in debug mode.
 
    =============
    DOCUMENTATION
