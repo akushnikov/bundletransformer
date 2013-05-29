@@ -43,8 +43,8 @@
 
 			bundles.Add(modernizrBundle);
 
-			var jQueryBundle = new CustomScriptBundle("~/Bundles/Jquery", 
-				"http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js");
+			var jQueryBundle = new CustomScriptBundle("~/Bundles/Jquery",
+				"http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.0.min.js");
 			jQueryBundle.Include("~/Scripts/jquery-{version}.js");
 			jQueryBundle.Orderer = nullOrderer;
 			jQueryBundle.CdnFallbackExpression = "window.jquery";
