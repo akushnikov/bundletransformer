@@ -1,7 +1,7 @@
 
 
    ----------------------------------------------------------------------
-         README file for Bundle Transformer: UglifyJS 1.7.9 Beta 1
+         README file for Bundle Transformer: UglifyJS 1.7.12 Beta 1
  
    ----------------------------------------------------------------------
 
@@ -27,7 +27,7 @@
    =============
    RELEASE NOTES
    =============
-   Added support of UglifyJS version 2.3.6.
+   Added features from commit "Escape null characters as \x00".
    
    =============
    DOCUMENTATION
