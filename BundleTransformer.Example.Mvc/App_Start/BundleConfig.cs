@@ -68,7 +68,7 @@
 
 			bundles.Add(commonScriptsBundle);
 
-
+			
 			var jqueryUiStylesDirectoryBundle = new Bundle("~/Bundles/JqueryUiStylesDirectory")
 			{
 				Builder = nullBuilder
@@ -77,7 +77,6 @@
 			jqueryUiStylesDirectoryBundle.Transforms.Add(new CssTransformer(
 				new[] { "*.all.css", "jquery.ui.base.css" }));
 			bundles.Add(jqueryUiStylesDirectoryBundle);
-
 
 			var scriptsDirectoryBundle = new Bundle("~/Bundles/ScriptsDirectory")
 			{
