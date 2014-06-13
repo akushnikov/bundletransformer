@@ -1,0 +1,31 @@
+﻿@import (css) "folder/OpenIdIcon.less";
+@import (once) "Mixins.less";
+@import (reference) "Selectors.less";
+
+@bg-color: #7AC0DA;
+@caption-color: #FFFFFF;
+@monitor-icon-url: "folder/monitor.png";
+
+.translators #less
+{
+	float: left;
+	.visible;
+	padding: 0.2em 0.5em 0.2em 0.5em;
+	background-color: @bg-color;
+	color: @caption-color;
+	font-weight: bold;
+	border: 1px solid @bg-color;
+	.border-radius(5px);
+
+	&.left-side:before {
+		content: "▼";
+	}
+}
+
+.icon-monitor
+{
+	display: inline;
+	background-image: url("@{monitor-icon-url}");
+}
+
+@import (once) "folder/TestLessImport";

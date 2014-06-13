@@ -1,0 +1,34 @@
+﻿@charset "UTF-8";
+
+@captionText: `"less".toUpperCase()`;
+@border-color: #143352;
+
+.translators #less
+{
+	border-color: @border-color;
+}
+
+.icon-network
+{
+	display: inline;
+	background-image: data-uri('image/png', "@network.png");
+}
+
+.icon-webcam
+{
+	display: inline;
+	background-image: data-uri("../webcam.jpg");
+}
+
+@import url("../TagIcon.css");
+@import (css) "../UsbFlashDriveIcon";
+@import (less) "../ValidationIcon.css";
+@import "../YahooIcon.less";
+@import (inline) "../MicroformatsIcon.css";
+@import (inline, css) "../NodeIcon.less" screen and (color), projection and (color);
+
+.icon-xfn
+{
+	display: inline;
+	background-image: data-uri("../../xfn.png");
+}

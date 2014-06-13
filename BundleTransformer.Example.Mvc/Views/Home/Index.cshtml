@@ -1,0 +1,90 @@
+﻿@{
+	ViewBag.Title = "Home Page";
+}
+
+@section featured {
+<section class="featured">
+    <div class="content-wrapper">
+        <hgroup class="title">
+            <h1>Bundle Transformer</h1>
+            <h2> - a modular extension for Microsoft ASP.NET Web Optimization Framework</h2>
+        </hgroup>
+        <p>
+            To learn more about Bundle Transformer visit <a href="http://bundletransformer.codeplex.com/" target="_blank" title="Bundle Transformer Website on CodePlex">http://bundletransformer.codeplex.com</a>. 
+            If you have any questions about Bundle Transformer, then visit <a href="http://bundletransformer.codeplex.com/discussions" target="_blank" title="Bundle Transformer Discussions List">our discussions</a>.
+        </p>
+    </div>
+</section>
+}
+
+<p>Installed following translators:</p>
+<div class="translators">
+	<div id="less"><a href="http://lesscss.org/" target="_blank">LESS</a></div>
+	<div id="sass"><a href="http://sass-lang.com/" target="_blank">Sass</a></div>
+	<div id="scss"><a href="http://sass-lang.com/" target="_blank">SCSS</a></div>
+	<div id="coffee"><a href="http://coffeescript.org/" target="_blank">CoffeeScript</a></div>
+	<div id="ts"><a href="http://www.typescriptlang.org/" target="_blank">TS</a></div>
+</div>
+
+<p>Below the icons is used to validate the processing of relative paths in the CSS-code.</p>
+<div class="icons">
+	<div class="icon icon-abacus" title="Abacus"></div>
+	<div class="icon icon-bug" title="Bug"></div>
+	<div class="icon icon-cactus" title="Cactus"></div>
+	<div class="icon icon-disc" title="Disc"></div>
+	<div class="icon icon-envelope" title="Envelope"></div>
+	<div class="icon icon-feed" title="Feed"></div>
+	<div class="icon icon-game" title="Game"></div>
+	<div class="icon icon-headphone" title="Headphone"></div>
+	<div class="icon icon-inbox" title="Inbox"></div>
+	<div class="icon icon-joystick" title="Joystick"></div>
+	<div class="icon icon-keyboard" title="Keyboard"></div>
+	<div class="icon icon-license" title="License"></div>
+	<div class="icon icon-monitor" title="Monitor"></div>
+	<div class="icon icon-network" title="Network"></div>
+	<div class="icon icon-open-source" title="Open source"></div>
+	<div class="icon icon-plug" title="Plug"></div>
+	<div class="icon icon-question" title="Question"></div>
+	<div class="icon icon-radio" title="Radio"></div>
+	<div class="icon icon-scanner" title="Scanner"></div>
+	<div class="icon icon-tag" title="Tag"></div>
+	<div class="icon icon-usb-flash-drive" title="USB flash drive"></div>
+	<div class="icon icon-validation" title="Validation"></div>
+	<div class="icon icon-webcam" title="Webcam"></div>
+	<div class="icon icon-xfn" title="XFN"></div>
+	<div class="icon icon-yahoo" title="Yahoo!"></div>
+</div>
+<div class="icons">
+	<div class="icon icon-android" title="Android"></div>
+	<div class="icon icon-battery" title="Battery"></div>
+	<div class="icon icon-computer" title="Computer"></div>
+	<div class="icon icon-database" title="Database"></div>
+	<div class="icon icon-ebook-reader" title="Ebook reader"></div>
+	<div class="icon icon-folder" title="Folder"></div>
+	<div class="icon icon-git" title="Git"></div>
+	<div class="icon icon-hourglass" title="Hourglass"></div>
+	<div class="icon icon-image" title="Image"></div>
+	<div class="icon icon-json" title="JSON"></div>
+	<div class="icon icon-key" title="Key"></div>
+	<div class="icon icon-layout" title="Layout"></div>
+	<div class="icon icon-microformats" title="Microformats"></div>
+	<div class="icon icon-node" title="Node"></div>
+	<div class="icon icon-openid" title="OpenID"></div>
+</div>
+
+<h3>Exploring the code of this demo site you will learn:</h3>
+
+<ol class="round">
+    <li class="one">
+        <h5>Register assets in the BundleConfig.cs file</h5>
+		In code of the <code>BundleConfig.cs</code> file, which is located in the folder <code>App_Start</code>, you will see examples of how you can register the assets with help of methods <code>Include</code> and <code>IncludeDirectory</code> of class <code>Bundle</code>.
+    </li>
+    <li class="two">
+        <h5>Configure Bundle Transformer and its separate modules</h5>
+        In the <code>Web.config</code> file, you will see an example of advanced settings of Bundle Transformer and its separate modules.
+    </li>
+    <li class="three">
+        <h5>See the results of work of translators and minifiers</h5>
+        During viewing of output CSS- and JavaScript-code, you can see the result of work of translators and minifiers.
+    </li>
+</ol>

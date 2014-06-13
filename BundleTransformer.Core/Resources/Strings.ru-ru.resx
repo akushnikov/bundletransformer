@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AssetHandler_BundleFileNotFound" xml:space="preserve">
+    <value>Не удалось найти файл "{0}" в "{1}" бандле!</value>
+  </data>
+  <data name="AssetHandler_BundleNotFound" xml:space="preserve">
+    <value>Бандл "{0}" не существует!</value>
+  </data>
+  <data name="AssetHandler_DependencyNotFound" xml:space="preserve">
+    <value>Во время вывода текстового содержимого обработанного ресурса не была найдена одна из его зависимостей!
+Смотрите более подробную информацию об ошибке:
+{0}</value>
+  </data>
+  <data name="AssetHandler_TransformerNotFound" xml:space="preserve">
+    <value>Не удалось найти трансформер в "{0}" бандле!</value>
+  </data>
+  <data name="AssetHandler_TranslatorNotFound" xml:space="preserve">
+    <value>Не удалось найти транслятор типа `{0}` для файла "{1}"!</value>
+  </data>
+  <data name="AssetHandler_UnknownError" xml:space="preserve">
+    <value>Во время вывода текстового содержимого обработанного ресурса произошла неизвестная ошибка!
+Смотрите более подробную информацию об ошибке:
+{0}</value>
+  </data>
+  <data name="Assets_CssAssetsContainAssetsWithInvalidTypes" xml:space="preserve">
+    <value>Перечисленные ресурсы не являются таблицами стилей: {0}!</value>
+  </data>
+  <data name="Assets_InvalidIgnorePattern" xml:space="preserve">
+    <value>Шаблоны для исключения ненужных ресурсов вида `*` и `*.*` не поддерживаются!</value>
+  </data>
+  <data name="Assets_JsAssetsContainAssetsWithInvalidTypes" xml:space="preserve">
+    <value>Перечисленные ресурсы не являются скриптами: {0}!</value>
+  </data>
+  <data name="Common_ArgumentIsEmpty" xml:space="preserve">
+    <value>Параметр с именем `{0}` не должен содержать пустую строку!</value>
+  </data>
+  <data name="Common_ArgumentIsNull" xml:space="preserve">
+    <value>Параметр с именем `{0}` не должен содержать значение равное null!</value>
+  </data>
+  <data name="Common_AssemblyNameIsEmpty" xml:space="preserve">
+    <value>Вы не указали имя сборки!</value>
+  </data>
+  <data name="Common_EnumValueConversionFailed" xml:space="preserve">
+    <value>Невозможно преобразовать значение "{0}" перечислимого типа `{1}` в значение перечислимого типа `{2}`!</value>
+  </data>
+  <data name="Common_EnumValueToCodeConversionFailed" xml:space="preserve">
+    <value>Не удается найти строковый код, соответствующий значению "{0}" перечислимого типа `{1}`!</value>
+  </data>
+  <data name="Common_FileNotExist" xml:space="preserve">
+    <value>Файл "{0}" не существует!</value>
+  </data>
+  <data name="Common_InstanceCreationFailed" xml:space="preserve">
+    <value>При создании экземпляра объекта типа `{0}` из сборки `{1}` произошла ошибка!</value>
+  </data>
+  <data name="Common_SeverityLevelToEnumValueConversionFailed" xml:space="preserve">
+    <value>Не удается найти значениe перечислимого типа `{0}`, соответствующее коду серьезности ошибки {1}!</value>
+  </data>
+  <data name="Common_TypeNameIsEmpty" xml:space="preserve">
+    <value>Вы не указали имя типа!</value>
+  </data>
+  <data name="Common_UnknownError" xml:space="preserve">
+    <value>Неизвестная ошибка.</value>
+  </data>
+  <data name="Common_UnknownMimeType" xml:space="preserve">
+    <value>Не удалось определить MIME-тип файла "{0}"!</value>
+  </data>
+  <data name="Common_ValueIsEmpty" xml:space="preserve">
+    <value>Значение не должно быть пустым!</value>
+  </data>
+  <data name="Common_ValueIsNull" xml:space="preserve">
+    <value>Значение не должно быть равно null!</value>
+  </data>
+  <data name="Configuration_DefaultMinifierNotSpecified" xml:space="preserve">
+    <value>Вы не задали минимизатор {0}-кода по умолчанию!</value>
+  </data>
+  <data name="Configuration_JsEngineNotSpecified" xml:space="preserve">
+    <value>В атрибуте `name` конфигурационного элемента `/configuration/bundleTransformer/{0}/jsEngine` не указано название JavaScript-движка.
+
+Если у вас еще не установлен ни один JavaScript-движок, то для нормальной работы данного модуля рекомендуется установить один из следующих NuGet-пакетов: {1}
+
+После установки пакета присвойте название JavaScript-движка (например, `{2}`) атрибуту `name` конфигурационного элемента `/configuration/bundleTransformer/{0}/jsEngine`.</value>
+  </data>
+  <data name="Configuration_MinifierNotRegistered" xml:space="preserve">
+    <value>Минимизатор {0}-кода с именем `{1}` не зарегистрирован в конфигурационном файле!</value>
+  </data>
+  <data name="Configuration_PostProcessorNotRegistered" xml:space="preserve">
+    <value>Постпроцессор {0}-кода с именем `{1}` не зарегистрирован в конфигурационном файле!</value>
+  </data>
+  <data name="Configuration_TranslatorNotRegistered" xml:space="preserve">
+    <value>Транслятор, компилирующий код на промежуточном языке в {0}, и имеющий имя `{1}` не зарегистрирован в конфигурационном файле!</value>
+  </data>
+  <data name="ErrorDetails_ColumnNumber" xml:space="preserve">
+    <value>Номер столбца</value>
+  </data>
+  <data name="ErrorDetails_EndColumn" xml:space="preserve">
+    <value>Конечный символ</value>
+  </data>
+  <data name="ErrorDetails_EndLine" xml:space="preserve">
+    <value>Конечная строка</value>
+  </data>
+  <data name="ErrorDetails_ErrorCode" xml:space="preserve">
+    <value>Код ошибки</value>
+  </data>
+  <data name="ErrorDetails_ErrorType" xml:space="preserve">
+    <value>Тип ошибки</value>
+  </data>
+  <data name="ErrorDetails_File" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="ErrorDetails_HelpKeyword" xml:space="preserve">
+    <value>Ключевые слова из справки</value>
+  </data>
+  <data name="ErrorDetails_LineNumber" xml:space="preserve">
+    <value>Номер строки</value>
+  </data>
+  <data name="ErrorDetails_LineSource" xml:space="preserve">
+    <value>Содержимое строки</value>
+  </data>
+  <data name="ErrorDetails_Message" xml:space="preserve">
+    <value>Сообщение об ошибке</value>
+  </data>
+  <data name="ErrorDetails_Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="ErrorDetails_ScriptStackTrace" xml:space="preserve">
+    <value>Трассировки стека скрипта</value>
+  </data>
+  <data name="ErrorDetails_Severity" xml:space="preserve">
+    <value>Серьезность</value>
+  </data>
+  <data name="ErrorDetails_SourceError" xml:space="preserve">
+    <value>Источник ошибки</value>
+  </data>
+  <data name="ErrorDetails_SourceName" xml:space="preserve">
+    <value>Имя источника ошибки</value>
+  </data>
+  <data name="ErrorDetails_StartColumn" xml:space="preserve">
+    <value>Начальный символ</value>
+  </data>
+  <data name="ErrorDetails_StartLine" xml:space="preserve">
+    <value>Начальная строка</value>
+  </data>
+  <data name="ErrorDetails_Subcategory" xml:space="preserve">
+    <value>Подкатегория</value>
+  </data>
+  <data name="ErrorType_Error" xml:space="preserve">
+    <value>ошибка</value>
+  </data>
+  <data name="ErrorType_Warning" xml:space="preserve">
+    <value>предупреждение</value>
+  </data>
+  <data name="Minifiers_MinificationFailed" xml:space="preserve">
+    <value>Во время минимизации {0}-кода, считанного из файла "{1}", с помощью {2} произошла ошибка!	
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="Minifiers_MinificationSyntaxError" xml:space="preserve">
+    <value>Во время минимизации {0}-кода, считанного из файла "{1}", с помощью {2} произошла синтаксическая ошибка!
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="PostProcessors_PostprocessingFailed" xml:space="preserve">
+    <value>Во время постобработки {0}-кода, считанного из файла "{1}", с помощью {2} произошла ошибка!	
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="PostProcessors_PostprocessingSyntaxError" xml:space="preserve">
+    <value>Во время постобработки {0}-кода, считанного из файла "{1}", с помощью {2} произошла синтаксическая ошибка!
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="Resources_ResourceIsNull" xml:space="preserve">
+    <value>Ресурс с именем "{0}" содержит значение равное null!</value>
+  </data>
+  <data name="Translators_TranslationFailed" xml:space="preserve">
+    <value>Во время трансляции {0}-кода, считанного из файла "{2}", в {1}-код произошла ошибка!
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="Translators_TranslationSyntaxError" xml:space="preserve">
+    <value>Во время трансляции {0}-кода, считанного из файла "{2}", в {1}-код произошла синтаксическая ошибка!
+Смотрите более подробную информацию об ошибке:
+
+{3}</value>
+  </data>
+  <data name="UrlMappings_OnlyAppRelativeUrlAllowed" xml:space="preserve">
+    <value>URL "{0}" является недопустимым. Разрешено использовать только URL'ы, заданные относительно приложения (~/url).</value>
+  </data>
+</root>

@@ -1,0 +1,76 @@
+﻿.site-title
+{
+	margin: 20px 0 5px -5px;
+}
+
+.site-title IMG
+{
+	width: 338px;
+	height: 94px;
+	border: none;
+}
+
+.main-content H1,
+.main-content H2 {
+	font-family: "Bitstream Vera Sans Bold";
+	font-weight: normal;
+}
+
+.main-content H2 {
+	font-size: 1.5em;
+}
+
+A
+{
+	padding-left: 0;
+	padding-right: 0;
+}
+
+CODE
+{
+	font-size: 1.0em;
+	font-family: Courier New;
+}
+
+#social LI
+{
+    display: inline;
+    list-style: none;
+}
+
+    #social LI A
+    {
+        color: #999;
+        text-decoration: none;
+    }
+
+    A.twitter, A.linkedin
+    {
+        display: block;
+        float: left;
+        height: 24px;
+        padding-left: 17px;
+        text-indent: -9999px;
+        width: 16px;
+    }
+
+    A.twitter 
+    {
+        background: url("../Images/twitter.png") no-repeat;
+    }
+    
+	A.linkedin
+	{
+		background: url("../Content/images/linkedin.png") no-repeat;
+	}
+
+/********************
+*   Mobile Styles   *
+********************/
+@media only screen and (max-width: 850px) 
+{
+	.site-title
+	{
+		padding-left: 0;
+	}
+}
