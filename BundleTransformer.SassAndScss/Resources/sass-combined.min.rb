@@ -1,5 +1,5 @@
 ﻿#############################################################################
-# Sass v3.3.7
+# Sass v3.3.8
 # http://sass-lang.com
 #
 # Copyright 2006-2014, Hampton Catlin, Nathan Weizenbaum and Chris Eppstein
@@ -119,6 +119,30 @@ module Sass
         end
         a
       end
+    end
+    def replace_subseq(arr, subseq, replacement)
+      new = []
+      matched = []
+      i = 0
+      arr.each do |elem|
+        if elem != subseq[i]
+          new.push(*matched)
+          matched = []
+          i = 0
+          new << elem
+          next
+        end
+        if i == subseq.length - 1
+          matched = []
+          i = 0
+          new.push(*replacement)
+        else
+          matched << elem
+          i += 1
+        end
+      end
+      new.push(*matched)
+      new
     end
     def intersperse(enum, val)
       enum.inject([]) {|a, e| a << e << val}[0...-1]
@@ -2178,7 +2202,7 @@ WARNING
   end
   def visit_cssimport(node)
     node.resolved_uri = run_interp([node.uri])
-    if node.query
+    if node.query && !node.query.empty?
       parser = Sass::SCSS::StaticParser.new(run_interp(node.query),
         node.filename, node.options[:importer], node.line)
       node.resolved_query ||= parser.parse_media_query_list
@@ -2394,18 +2418,26 @@ class Sass::Tree::Visitors::Cssize < Sass::Tree::Visitors::Base
     Bubble.new(node)
   end
   def debubble(children, parent = nil)
+    previous_parent = nil
     Sass::Util.slice_by(children) {|c| c.is_a?(Bubble)}.map do |(is_bubble, slice)|
       unless is_bubble
         next slice unless parent
-        new_parent = parent.dup
-        new_parent.children = slice
-        next new_parent
+        if previous_parent
+          previous_parent.children.push(*slice)
+          next []
+        else
+          previous_parent = new_parent = parent.dup
+          new_parent.children = slice
+          next new_parent
+        end
       end
-      next slice.map do |bubble|
+      slice.map do |bubble|
         next unless (node = block_given? ? yield(bubble.node) : bubble.node)
         node.tabs += bubble.tabs
         node.group_end = bubble.group_end
-        [visit(node)].flatten
+        results = [visit(node)].flatten
+        previous_parent = nil unless results.empty?
+        results
       end.compact
     end.flatten
   end
@@ -2664,12 +2696,13 @@ class Sass::Tree::Visitors::Convert < Sass::Tree::Visitors::Base
     "#{tab_str}@return #{node.expr.to_sass(@options)}#{semi}\n"
   end
   def visit_rule(node)
+    rule = node.parsed_rules ? node.parsed_rules.to_a : node.rule
     if @format == :sass
-      name = selector_to_sass(node.rule)
+      name = selector_to_sass(rule)
       name = "\\" + name if name[0] == ?:
       name.gsub(/^/, tab_str) + yield
     elsif @format == :scss
-      name = selector_to_scss(node.rule)
+      name = selector_to_scss(rule)
       res = name + yield
       if node.children.last.is_a?(Sass::Tree::CommentNode) && node.children.last.type == :silent
         res.slice!(-3..-1)
@@ -3501,8 +3534,7 @@ module Sass
       end
       def to_a
         arr = Sass::Util.intersperse(@members.map {|m| m.to_a}, ", ").flatten
-        arr.delete("\n")
-        arr
+        Sass::Util.replace_subseq(arr, [", ", "\n"], [",\n"])
       end
       private
       def _hash
@@ -3571,7 +3603,9 @@ module Sass
         ary = @members.map do |seq_or_op|
           seq_or_op.is_a?(SimpleSequence) ? seq_or_op.to_a : seq_or_op
         end
-        Sass::Util.intersperse(ary, " ").flatten.compact
+        ary = Sass::Util.intersperse(ary, " ").flatten.compact
+        ary = Sass::Util.replace_subseq(ary, ["\n", " "], ["\n"])
+        Sass::Util.replace_subseq(ary, [" ", "\n"], ["\n"])
       end
       def inspect
         members.map {|m| m.inspect}.join(" ")
@@ -4978,7 +5012,7 @@ module Sass::Script
     declare :map_has_key, [:map, :key]
     def keywords(args)
       assert_type args, :ArgList, :args
-      map(Sass::Util.map_keys(args.keywords.as_stored) {|k| Sass::Script::String.new(k)})
+      map(Sass::Util.map_keys(args.keywords.as_stored) {|k| Sass::Script::Value::String.new(k)})
     end
     declare :keywords, [:args]
     def if(condition, if_true, if_false)
@@ -7517,7 +7551,7 @@ module Sass
       def parse
         init_scanner!
         root = stylesheet
-        expected("selector or at-rule") unless @scanner.eos?
+        expected("selector or at-rule") unless root && @scanner.eos?
         root
       end
       def parse_interp_ident
@@ -7527,19 +7561,19 @@ module Sass
       def parse_media_query_list
         init_scanner!
         ql = media_query_list
-        expected("media query list") unless @scanner.eos?
+        expected("media query list") unless ql && @scanner.eos?
         ql
       end
       def parse_at_root_query
         init_scanner!
         query = at_root_query
-        expected("@at-root query list") unless @scanner.eos?
+        expected("@at-root query list") unless query && @scanner.eos?
         query
       end
       def parse_supports_condition
         init_scanner!
         condition = supports_condition
-        expected("supports condition") unless @scanner.eos?
+        expected("supports condition") unless condition && @scanner.eos?
         condition
       end
       private
@@ -9962,15 +9996,16 @@ WARNING
       if scanner.match?(/url\(/i)
         script_parser = Sass::Script::Parser.new(scanner, @line, to_parser_offset(offset), @options)
         str = script_parser.parse_string
-        media_parser = Sass::SCSS::Parser.new(scanner,
-          @options[:filename], @options[:importer],
-          @line, str.source_range.end_pos.offset)
-        if (media = media_parser.parse_media_query_list)
-          end_pos = Sass::Source::Position.new(@line, media_parser.offset + 1)
-          node = Tree::CssImportNode.new(str, media.to_a)
-        else
+        if scanner.eos?
           end_pos = str.source_range.end_pos
           node = Tree::CssImportNode.new(str)
+        else
+          media_parser = Sass::SCSS::Parser.new(scanner,
+            @options[:filename], @options[:importer],
+            @line, str.source_range.end_pos.offset)
+          media = media_parser.parse_media_query_list
+          end_pos = Sass::Source::Position.new(@line, media_parser.offset + 1)
+          node = Tree::CssImportNode.new(str, media.to_a)
         end
         node.source_range = Sass::Source::Range.new(
           str.source_range.start_pos, end_pos,
