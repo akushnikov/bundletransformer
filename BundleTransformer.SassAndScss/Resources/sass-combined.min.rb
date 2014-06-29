@@ -1,5 +1,5 @@
 ﻿#############################################################################
-# Sass v3.3.8
+# Sass v3.3.9
 # http://sass-lang.com
 #
 # Copyright 2006-2014, Hampton Catlin, Nathan Weizenbaum and Chris Eppstein
@@ -1588,6 +1588,9 @@ module Sass
         @args = args
         @splat = splat
         super()
+        if %w[and or not].include?(name)
+          raise Sass::SyntaxError.new("Invalid function name \"#{name}\".")
+        end
       end
     end
   end
@@ -3301,17 +3304,28 @@ class Sass::Tree::Visitors::CheckNesting < Sass::Tree::Visitors::Base
   SCRIPT_NODES = [Sass::Tree::ImportNode] + CONTROL_NODES
   def visit_children(parent)
     old_parent = @parent
-    unless is_any_of?(parent, SCRIPT_NODES) ||
-        (parent.bubbles? &&
-        !old_parent.is_a?(Sass::Tree::RootNode) &&
-        !old_parent.is_a?(Sass::Tree::AtRootNode))
+    if parent.is_a?(Sass::Tree::AtRootNode) && parent.resolved_value
+      old_parents = @parents
+      @parents = @parents.reject {|p| parent.exclude_node?(p)}
+      @parent = Sass::Util.enum_with_index(@parents.reverse).
+        find {|p, i| !transparent_parent?(p, @parents[-i - 2])}.first
+      begin
+        return super
+      ensure
+        @parents = old_parents
+        @parent = old_parent
+      end
+    end
+    unless transparent_parent?(parent, old_parent)
       @parent = parent
     end
     @parents.push parent
-    super
-  ensure
-    @parent = old_parent
-    @parents.pop
+    begin
+      super
+    ensure
+      @parent = old_parent
+      @parents.pop
+    end
   end
   def visit_root(node)
     yield
@@ -3402,6 +3416,12 @@ class Sass::Tree::Visitors::CheckNesting < Sass::Tree::Visitors::Base
     "@return may only be used within a function." unless parent.is_a?(Sass::Tree::FunctionNode)
   end
   private
+  def transparent_parent?(parent, grandparent)
+    is_any_of?(parent, SCRIPT_NODES) ||
+      (parent.bubbles? &&
+       !grandparent.is_a?(Sass::Tree::RootNode) &&
+       !grandparent.is_a?(Sass::Tree::AtRootNode))
+  end
   def is_any_of?(val, classes)
     classes.each do |c|
       return true if val.is_a?(c)
