@@ -1,5 +1,5 @@
 ﻿#############################################################################
-# Sass v3.3.9
+# Sass v3.3.10
 # http://sass-lang.com
 #
 # Copyright 2006-2014, Hampton Catlin, Nathan Weizenbaum and Chris Eppstein
@@ -64,7 +64,7 @@ end
 module Sass
   module Util
     extend self
-    RUBY_VERSION = ::RUBY_VERSION.split(".").map {|s| s.to_i}
+    RUBY_VERSION_COMPONENTS = RUBY_VERSION.split(".").map {|s| s.to_i}
     RUBY_ENGINE = defined?(::RUBY_ENGINE) ? ::RUBY_ENGINE : "ruby"
     def scope(file)
       File.join(Sass::ROOT_DIR, file)
@@ -358,21 +358,29 @@ module Sass
       path = Pathname.new(path) unless path.is_a?(Pathname)
       pathname(path.cleanpath.to_s)
     end
+    def file_uri_from_path(path)
+      path = path.to_s if path.is_a?(Pathname)
+      path = Sass::Util.escape_uri(path)
+      return path.start_with?('/') ? "file://" + path : path unless windows?
+      return "file:///" + path.tr("\\", "/") if path =~ /^[a-zA-Z]:[\/\\]/
+      return "file://" + path.tr("\\", "/") if path =~ /\\\\[^\\]+\\[^\\\/]+/
+      path.tr("\\", "/")
+    end
     def destructure(val)
       val || []
     end
     def ruby1?
       return @ruby1 if defined?(@ruby1)
-      @ruby1 = Sass::Util::RUBY_VERSION[0] <= 1
+      @ruby1 = RUBY_VERSION_COMPONENTS[0] <= 1
     end
     def ruby1_8?
       return @ruby1_8 if defined?(@ruby1_8)
       @ruby1_8 = ironruby? ||
-                   (Sass::Util::RUBY_VERSION[0] == 1 && Sass::Util::RUBY_VERSION[1] < 9)
+                   (RUBY_VERSION_COMPONENTS[0] == 1 && RUBY_VERSION_COMPONENTS[1] < 9)
     end
     def ruby1_8_6?
       return @ruby1_8_6 if defined?(@ruby1_8_6)
-      @ruby1_8_6 = ruby1_8? && Sass::Util::RUBY_VERSION[2] < 7
+      @ruby1_8_6 = ruby1_8? && RUBY_VERSION_COMPONENTS[2] < 7
     end
     def jruby1_6?
       return @jruby1_6 if defined?(@jruby1_6)
@@ -631,7 +639,7 @@ MSG
       set1.to_a.uniq.sort_by {|e| e.hash}.eql?(set2.to_a.uniq.sort_by {|e| e.hash})
     end
     def inspect_obj(obj)
-      return obj.inspect unless version_geq(::RUBY_VERSION, "1.9.2")
+      return obj.inspect unless version_geq(RUBY_VERSION, "1.9.2")
       return ':' + inspect_obj(obj.to_s) if obj.is_a?(Symbol)
       return obj.inspect unless obj.is_a?(String)
       '"' + obj.gsub(/[\x00-\x7F]+/) {|s| s.inspect[1...-1]} + '"'
@@ -1051,7 +1059,7 @@ module Sass::Source
       end
       css_path &&= Sass::Util.pathname(Sass::Util.absolute_path(css_path))
       sourcemap_path &&= Sass::Util.pathname(Sass::Util.absolute_path(sourcemap_path))
-      css_uri ||= css_path.relative_path_from(sourcemap_path.dirname).to_s.tr('\\', '/')
+      css_uri ||= Sass::Util.file_uri_from_path(css_path.relative_path_from(sourcemap_path.dirname))
       result = "{\n"
       write_json_field(result, "version", 3, true)
       source_uri_to_id = {}
@@ -8954,7 +8962,7 @@ module Sass
           file_pathname = Sass::Util.cleanpath(Sass::Util.absolute_path(name, @root))
           sourcemap_pathname = Sass::Util.cleanpath(sourcemap_directory)
           begin
-            file_pathname.relative_path_from(sourcemap_pathname).to_s
+            Sass::Util.file_uri_from_path(file_pathname.relative_path_from(sourcemap_pathname))
           rescue ArgumentError # when a relative path cannot be constructed
             warn_about_public_url(name)
             nil
