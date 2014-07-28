@@ -1,8 +1,8 @@
 ﻿#############################################################################
-# Sass v3.3.10
+# Sass v3.3.11
 # http://sass-lang.com
 #
-# Copyright 2006-2014, Hampton Catlin, Nathan Weizenbaum and Chris Eppstein
+# Copyright 2006-2013 Hampton Catlin, Natalie Weizenbaum, and Chris Eppstein
 # Released under the MIT License
 #############################################################################
 dir = File.dirname(__FILE__)
@@ -4853,6 +4853,7 @@ module Sass::Script
       assert_unit start_at, nil, "start-at"
       end_at = number(-1) if end_at.nil?
       assert_unit end_at, nil, "end-at"
+      return Sass::Script::Value::String.new("", string.type) if end_at.value == 0
       s = start_at.value > 0 ? start_at.value - 1 : start_at.value
       e = end_at.value > 0 ? end_at.value - 1 : end_at.value
       s = string.value.length + s if s < 0
@@ -8590,7 +8591,7 @@ MESSAGE
       def tok(rx, last_group_lookahead = false)
         res = @scanner.scan(rx)
         if res
-		  if  last_group_lookahead
+          if  last_group_lookahead
 			lastgroup = rx.match( @scanner.matched )[-1]
 			if lastgroup
 			  @scanner.pos -= lastgroup.length
@@ -9056,8 +9057,8 @@ WARNING
       private
       def _find(dir, name, options)
         full_filename, syntax = Sass::Util.destructure(find_real_file(dir, name, options))
-		full_filename = full_filename.gsub(/\\/, "/")
-		return unless full_filename
+        full_filename = full_filename.gsub(/\\/, "/")
+        return unless full_filename
         options[:syntax] = syntax
         options[:filename] = full_filename
         options[:importer] = self
