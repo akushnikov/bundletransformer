@@ -9,7 +9,7 @@
 #   You can redistribute it and/or modify it under the same term as Ruby.
 # Revision:: $Id: ldap.rb 25189 2009-10-02 12:04:37Z akr $
 #
-require 'uri/generic.min.rb'
+require 'uri/generic'
 module URI
   class LDAP < Generic
     DEFAULT_PORT = 389

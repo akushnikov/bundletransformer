@@ -5,7 +5,7 @@
 # License:: You can redistribute it and/or modify it under the same term as Ruby.
 # Revision:: $Id: ftp.rb 27350 2010-04-15 13:41:19Z mame $
 #
-require 'uri/generic.min.rb'
+require 'uri/generic'
 module URI
   class FTP < Generic
     DEFAULT_PORT = 21

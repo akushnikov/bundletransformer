@@ -1,4 +1,4 @@
-﻿require 'uri/ldap.min.rb'
+﻿require 'uri/ldap'
 module URI
   class LDAPS < LDAP
     DEFAULT_PORT = 636

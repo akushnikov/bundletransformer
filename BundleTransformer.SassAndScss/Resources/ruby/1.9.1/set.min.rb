@@ -255,7 +255,7 @@ class Set
   def divide(&func)
     func or return enum_for(__method__)
     if func.arity == 2
-      require 'tsort.min.rb'
+      require 'tsort'
       class << dig = {}		# :nodoc:
 	include TSort
 	alias tsort_each_node each_key
