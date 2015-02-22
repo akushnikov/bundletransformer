@@ -2,7 +2,7 @@
 #   rational18.rb -
 #       $Release Version: 0.5 $
 #       $Revision: 1.8 $
-#       $Date: 2015/02/14 11:01:32 $
+#       $Date: 2015/02/21 18:31:34 $
 #       by Andrey Taritsyn
 #
 # Documentation by Kevin Jackson and Gavin Sinclair.
@@ -80,7 +80,7 @@ class Rational < Numeric
     if a.kind_of?(Rational)
       num = @numerator * a.denominator
       num_a = a.numerator * @denominator
-      Rational(num - num_a, @denominator*a.denominator)
+      Rational(num - num_a, @denominator * a.denominator)
     elsif a.kind_of?(Integer)
       self - Rational.new!(a, 1)
     elsif a.kind_of?(Float)
@@ -211,7 +211,7 @@ class Rational < Numeric
     if @denominator == 1
       @numerator.to_s
     else
-      @numerator.to_s+"/"+@denominator.to_s
+      @numerator.to_s + " / " + @denominator.to_s
     end
   end
   def to_r
@@ -230,14 +230,14 @@ end
 class Fixnum
   undef quo
   def quo(other)
-    Rational.new!(self,1) / other
+    Rational.new!(self, 1) / other
   end
   alias rdiv quo
   def rpower (other)
     if other >= 0
       self.power!(other)
     else
-      Rational.new!(self,1)**other
+      Rational.new!(self, 1) ** other
     end
   end
   unless defined? 1.power!
@@ -251,14 +251,14 @@ class Bignum
   end
   undef quo
   def quo(other)
-    Rational.new!(self,1) / other
+    Rational.new!(self, 1) / other
   end
   alias rdiv quo
   def rpower (other)
     if other >= 0
       self.power!(other)
     else
-      Rational.new!(self, 1)**other
+      Rational.new!(self, 1) ** other
     end
   end
   unless defined? Complex

@@ -5,7 +5,7 @@
 # License:: You can redistribute it and/or modify it under the same term as Ruby.
 # Revision:: $Id: mailto.rb 27831 2010-05-16 11:35:59Z yugui $
 #
-require 'uri/generic'
+require 'uri/generic.min.rb'
 module URI
   class MailTo < Generic
     include REGEXP

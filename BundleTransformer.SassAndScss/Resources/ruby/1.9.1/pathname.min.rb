@@ -442,7 +442,7 @@ class Pathname    # * Dir *
 end
 class Pathname    # * Find *
   def find(&block) # :yield: pathname
-    require 'find'
+    require 'find.min.rb'
     if @path == '.'
       Find.find(@path) {|f| yield self.class.new(f.sub(%r{\A\./}, '')) }
     else

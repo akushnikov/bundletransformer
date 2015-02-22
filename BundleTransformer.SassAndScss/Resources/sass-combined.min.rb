@@ -7,12 +7,12 @@
 ##################################################################################
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift dir unless $LOAD_PATH.include?(dir)
-require 'set'
-require 'enumerator'
-require 'stringio'
-require 'rbconfig'
-require 'uri'
-require 'pathname'
+require 'set.min.rb'
+require 'enumerator.min.rb'
+require 'stringio.min.rb'
+require 'rbconfig.min.rb'
+require 'uri.min.rb'
+require 'pathname.min.rb'
 module Sass
   ROOT_DIR = File.expand_path(File.join(__FILE__, "../../.."))
 end
@@ -318,7 +318,7 @@ module Sass
       return @listen_geq_2 unless @listen_geq_2.nil?
       @listen_geq_2 =
         begin
-          require 'listen/version'
+          require 'listen/version.min.rb'
           version_geq(::Listen::VERSION, '2.0.0')
         rescue LoadError
           false
@@ -809,7 +809,7 @@ end
     singleton_methods.each {|method| module_function method}
   end
 end
-require 'strscan'
+require 'strscan.min.rb'
   Sass::Util::MultibyteStringScanner = StringScanner
 module Sass
   module Util
@@ -1010,7 +1010,7 @@ module Sass
   end
   self.logger = Sass::Logger::Base.new
 end
-require 'digest/sha1'
+require 'digest/sha1.min.rb'
 module Sass::Source
   class Position
     attr_accessor :line
@@ -4105,6 +4105,9 @@ module Sass
         _, si = Sass::Util.enum_with_index(seq2).find do |e, i|
           return if i == seq2.size - 1
           next if e.is_a?(String)
+          if i.nil?
+            i = -1
+          end
           seq1.first.superselector?(e, seq2[0...i])
         end
         return unless si

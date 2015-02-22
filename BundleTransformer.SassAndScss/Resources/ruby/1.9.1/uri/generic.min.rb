@@ -5,7 +5,7 @@
 # License:: You can redistribute it and/or modify it under the same term as Ruby.
 # Revision:: $Id: generic.rb 27350 2010-04-15 13:41:19Z mame $
 #
-require 'uri/common'
+require 'uri/common.min.rb'
 module URI
   class Generic
     include URI
