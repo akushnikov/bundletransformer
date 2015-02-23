@@ -7180,16 +7180,7 @@ module Sass::Script::Value
     attr_reader :value
     attr_reader :type
     def self.value(contents)
-      contents.gsub("\\\n", "").gsub(/\\(?:([0-9a-fA-F]{1,6})\s?|(.))/) do
-        next $2 if $2
-        code_point = $1.to_i(16)
-        if code_point == 0 || code_point > 0x10FFFF ||
-            (code_point >= 0xD800 && code_point <= 0xDFFF)
-          '�'
-        else
-          [code_point].pack("U")
-        end
-      end
+      contents.gsub("\\\n", "")
     end
     def self.quote(contents, quote = nil)
       unless contents =~ /[\n\\"']/
@@ -7207,7 +7198,7 @@ module Sass::Script::Value
           quote = '"'
         end
       end
-      contents = contents.gsub("\\", "\\\\\\\\")
+      contents = contents.gsub("\\", "\\\\")
       if quote == '"'
         contents = contents.gsub('"', "\\\"")
       else
@@ -9750,7 +9741,7 @@ WARNING
       private
       def _find(dir, name, options)
         full_filename, syntax = Sass::Util.destructure(find_real_file(dir, name, options))
-        full_filename = full_filename.gsub(/\\/, "/")
+        full_filename = full_filename.tr("\\", "/")
         return unless full_filename
         full_filename = full_filename.tr("\\", "/") if Sass::Util.windows?
         options[:syntax] = syntax
