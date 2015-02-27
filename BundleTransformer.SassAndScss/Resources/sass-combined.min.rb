@@ -606,7 +606,13 @@ end
       klass.send("#{attr}s").include?(ruby1_8? ? method.to_s : method.to_sym)
     end
     def enum_with_index(enum)
-      ruby1_8? ? enum.enum_with_index : enum.each_with_index
+      hash = Hash.new #BT+
+	  index = -1 #BT+
+	  enum.each do |item| #BT+
+		index += 1 #BT+
+		hash[item] = index #BT+
+	  end #BT+
+	  return hash #BT+
     end
     def enum_cons(enum, n)
       ruby1_8? ? enum.enum_cons(n) : enum.each_cons(n)
@@ -1335,7 +1341,7 @@ module Sass::Tree
       last.is_a?(String) && last[-1] == ?,
     end
     def debug_info
-      {:filename => filename && ("file://" + Sass::Util.escape_uri(filename)),
+      {:filename => filename && ("file://" + Sass::Util.escape_uri(filename)), #BT+
        :line => line}
     end
     def invisible?
@@ -3173,7 +3179,7 @@ class Sass::Tree::Visitors::ToCss < Sass::Tree::Visitors::Base
         ])
       prop = Sass::Tree::PropNode.new([""], Sass::Script::Value::String.new(''), :new)
       prop.resolved_name = "font-family"
-	  prop.resolved_value = !(v =~ /^\d+$/).nil? ? ("\\00003" + v) : Sass::SCSS::RX.escape_ident(v.to_s)
+	  prop.resolved_value = !(v =~ /^\d+$/).nil? ? ("\\00003" + v) : Sass::SCSS::RX.escape_ident(v.to_s) #BT+
       rule << prop
       node << rule
     end
@@ -4105,9 +4111,6 @@ module Sass
         _, si = Sass::Util.enum_with_index(seq2).find do |e, i|
           return if i == seq2.size - 1
           next if e.is_a?(String)
-          if i.nil?
-            i = -1
-          end
           seq1.first.superselector?(e, seq2[0...i])
         end
         return unless si
@@ -4126,6 +4129,8 @@ module Sass
       def parent_superselector?(seq1, seq2)
         base = Sass::Selector::SimpleSequence.new([Sass::Selector::Placeholder.new('<temp>')],
                                                   false)
+        seq1 = [] if seq1.nil? #BT+
+        seq2 = [] if seq2.nil? #BT+
         _superselector?(seq1 + [base], seq2 + [base])
       end
       def trim(seqses)
@@ -4672,7 +4677,7 @@ module Sass
       VARIABLE = /(\$)(#{Sass::SCSS::RX::IDENT})/
       RANGE    = /(?:#{H}|\?){1,6}/
       S = /[ \t\r\n\f]+/
-      COMMENT = %r{(?<![^/]?/)/\*([^*]|\*+[^/*])*\**\*/}
+      COMMENT = %r{(?<![^/]?/)/\*([^*]|\*+[^/*])*\**\*/} #BT+
       SINGLE_LINE_COMMENT = %r{//.*(\n[ \t]*//.*)*}
       CDO            = quote("<!--")
       CDC            = quote("-->")
@@ -7180,7 +7185,7 @@ module Sass::Script::Value
     attr_reader :value
     attr_reader :type
     def self.value(contents)
-      contents.gsub("\\\n", "")
+      contents.gsub("\\\n", "") #BT+
     end
     def self.quote(contents, quote = nil)
       unless contents =~ /[\n\\"']/
@@ -7198,7 +7203,7 @@ module Sass::Script::Value
           quote = '"'
         end
       end
-      contents = contents.gsub("\\", "\\\\")
+      contents = contents.gsub("\\", "\\\\") #BT+
       if quote == '"'
         contents = contents.gsub('"', "\\\"")
       else
@@ -9042,12 +9047,12 @@ module Sass
       def tok(rx, last_group_lookahead = false)
         res = @scanner.scan(rx)
         if res
-          if last_group_lookahead
-			lastgroup = rx.match( @scanner.matched )[-1]
-			if lastgroup
-			  @scanner.pos -= lastgroup.length
-			  res.slice!(-lastgroup.length..-1)
-			end
+          if last_group_lookahead #BT+
+			lastgroup = rx.match( @scanner.matched )[-1] #BT+
+			if lastgroup #BT+
+			  @scanner.pos -= lastgroup.length #BT+
+			  res.slice!(-lastgroup.length..-1) #BT+
+			end #BT+
           end
           newline_count = res.count(NEWLINE)
           if newline_count > 0
@@ -9741,7 +9746,7 @@ WARNING
       private
       def _find(dir, name, options)
         full_filename, syntax = Sass::Util.destructure(find_real_file(dir, name, options))
-        full_filename = full_filename.tr("\\", "/")
+        full_filename = full_filename.tr("\\", "/") #BT+
         return unless full_filename
         full_filename = full_filename.tr("\\", "/") if Sass::Util.windows?
         options[:syntax] = syntax
