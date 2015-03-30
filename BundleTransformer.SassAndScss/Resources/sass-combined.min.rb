@@ -1,5 +1,5 @@
 ﻿##################################################################################
-# Sass v3.4.12
+# Sass v3.4.13
 # http://sass-lang.com
 #
 # Copyright (c) 2006-2014 Hampton Catlin, Natalie Weizenbaum, and Chris Eppstein
@@ -2842,6 +2842,9 @@ class Sass::Tree::Visitors::Convert < Sass::Tree::Visitors::Base
       "#{tab_str}@at-root#{yield}"
     end
   end
+  def visit_keyframerule(node)
+    "#{tab_str}#{node.resolved_value}#{yield}\n"
+  end
   private
   def interp_to_src(interp)
     interp.map {|r| r.is_a?(String) ? r : r.to_sass(@options)}.join
@@ -3554,12 +3557,9 @@ module Sass
       def unify(sels)
         return sels if sels.any? {|sel2| eql?(sel2)}
         sels_with_ix = Sass::Util.enum_with_index(sels)
-        _, i =
-          if is_a?(Pseudo)
-            sels_with_ix.find {|sel, _| sel.is_a?(Pseudo) && (sels.last.type == :element)}
-          else
-            sels_with_ix.find {|sel, _| sel.is_a?(Pseudo)}
-          end
+        if !is_a?(Pseudo) || (sels.last.is_a?(Pseudo) && sels.last.type == :element)
+          _, i = sels_with_ix.find {|sel, _| sel.is_a?(Pseudo)}
+        end
         return sels + [self] unless i
         sels[0...i] + [self] + sels[i..-1]
       end
@@ -3976,10 +3976,19 @@ module Sass
         return [seq2] if seq1.empty?
         return [seq1] if seq2.empty?
         seq1, seq2 = seq1.dup, seq2.dup
-        init = merge_initial_ops(seq1, seq2)
-        return unless init
-        fin = merge_final_ops(seq1, seq2)
-        return unless fin
+        return unless (init = merge_initial_ops(seq1, seq2))
+        return unless (fin = merge_final_ops(seq1, seq2))
+        root1 = has_root?(seq1.first) && seq1.shift
+        root2 = has_root?(seq2.first) && seq2.shift
+        if root1 && root2
+          return unless (root = root1.unify(root2))
+          seq1.unshift root
+          seq2.unshift root
+        elsif root1
+          seq2.unshift root1
+        elsif root2
+          seq1.unshift root2
+        end
         seq1 = group_selectors(seq1)
         seq2 = group_selectors(seq2)
         lcs = Sass::Util.lcs(seq2, seq1) do |s1, s2|
@@ -4185,6 +4194,10 @@ module Sass
           next choices.first if choices.size == 1 && !choices.include?(' ')
           "(#{choices.join ', '})"
         end.join ' '
+      end
+      def has_root?(sseq)
+        sseq.is_a?(SimpleSequence) &&
+          sseq.members.any? {|sel| sel.is_a?(Pseudo) && sel.normalized_name == "root"}
       end
     end
   end
@@ -9419,6 +9432,12 @@ module Sass
       def parent_selector; nil; end
       def interpolation(warn_for_color = false); nil; end
       def use_css_import?; true; end
+      def block_contents(node, context)
+        if node.is_a?(Sass::Tree::DirectiveNode) && node.normalized_name == '@keyframes'
+          context = :keyframes
+        end
+        super(node, context)
+      end
       def block_child(context)
         case context
         when :ruleset
@@ -9427,6 +9446,8 @@ module Sass
           directive || ruleset
         when :directive
           directive || declaration_or_ruleset
+        when :keyframes
+          keyframes_ruleset
         end
       end
       def nested_properties!(node)
@@ -9436,6 +9457,11 @@ module Sass
         start_pos = source_position
         return unless (selector = selector_comma_sequence)
         block(node(Sass::Tree::RuleNode.new(selector, range(start_pos)), start_pos), :ruleset)
+      end
+      def keyframes_ruleset
+        start_pos = source_position
+        return unless (selector = keyframes_selector)
+        block(node(Sass::Tree::KeyframeRuleNode.new(selector.strip), start_pos), :ruleset)
       end
       @sass_script_parser = Class.new(Sass::Script::CssParser)
       @sass_script_parser.send(:include, ScriptParser)
