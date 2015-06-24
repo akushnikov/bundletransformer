@@ -1,8 +1,8 @@
 ﻿##################################################################################
-# Sass v3.4.14
+# Sass v3.4.15
 # http://sass-lang.com
 #
-# Copyright (c) 2006-2014 Hampton Catlin, Natalie Weizenbaum, and Chris Eppstein
+# Copyright (c) 2006-2015 Hampton Catlin, Natalie Weizenbaum, and Chris Eppstein
 # Released under the MIT License
 ##################################################################################
 dir = File.dirname(__FILE__)
@@ -103,6 +103,10 @@ module Sass
     end
     def restrict(value, range)
       [[value, range.first].max, range.last].min
+    end
+    def round(value)
+      return value.ceil if (value % 1) - 0.5 > -0.00001
+      value.round
     end
     def merge_adjacent_strings(arr)
       return arr if arr.size < 2
@@ -3865,7 +3869,7 @@ module Sass
     class Sequence < AbstractSequence
       def line=(line)
         members.each {|m| m.line = line if m.is_a?(SimpleSequence)}
-        line
+        @line = line
       end
       def filename=(filename)
         members.each {|m| m.filename = filename if m.is_a?(SimpleSequence)}
@@ -5106,7 +5110,7 @@ module Sass::Script
     declare :adjust_hue, [:color, :degrees]
     def ie_hex_str(color)
       assert_type color, :Color, :color
-      alpha = (color.alpha * 255).round.to_s(16).rjust(2, '0')
+      alpha = Sass::Util.round(color.alpha * 255).to_s(16).rjust(2, '0')
       identifier("##{alpha}#{color.send(:hex_str)[1..-1]}".upcase)
     end
     declare :ie_hex_str, [:color]
@@ -5341,7 +5345,7 @@ MESSAGE
     end
     declare :percentage, [:number]
     def round(number)
-      numeric_transformation(number) {|n| n.round}
+      numeric_transformation(number) {|n| Sass::Util.round(n)}
     end
     declare :round, [:number]
     def ceil(number)
@@ -7721,7 +7725,7 @@ module Sass::Script::Value
         unless (3..4).include?(attrs.size)
           raise ArgumentError.new("Color.new(array) expects a three- or four-element array")
         end
-        red, green, blue = attrs[0...3].map {|c| c.round}
+        red, green, blue = attrs[0...3].map {|c| Sass::Util.round(c)}
         @attrs = {:red => red, :green => green, :blue => blue}
         @attrs[:alpha] = attrs[3] ? attrs[3].to_f : 1
         @representation = representation
@@ -7745,7 +7749,7 @@ module Sass::Script::Value
       end
       [:red, :green, :blue].each do |k|
         next if @attrs[k].nil?
-        @attrs[k] = Sass::Util.restrict(@attrs[k].round, 0..255)
+        @attrs[k] = Sass::Util.restrict(Sass::Util.round(@attrs[k]), 0..255)
       end
       [:saturation, :lightness].each do |k|
         next if @attrs[k].nil?
@@ -7904,7 +7908,7 @@ module Sass::Script::Value
       end
       result = []
       (0...3).each do |i|
-        res = rgb[i].send(operation, other_num ? other.value : other.rgb[i])
+        res = rgb[i].to_f.send(operation, other_num ? other.value : other.rgb[i])
         result[i] = [[res, 255].min, 0].max
       end
       if !other_num && other.alpha != alpha
@@ -7923,7 +7927,7 @@ module Sass::Script::Value
         hue_to_rgb(m1, m2, h + 1.0 / 3),
         hue_to_rgb(m1, m2, h),
         hue_to_rgb(m1, m2, h - 1.0 / 3)
-      ].map {|c| (c * 0xff).round}
+      ].map {|c| Sass::Util.round(c * 0xff)}
     end
     def hue_to_rgb(m1, m2, h)
       h += 1 if h < 0
@@ -9793,6 +9797,41 @@ WARNING
   end
 end
 module Sass
+  module Importers
+    class DeprecatedPath < Filesystem
+      def initialize(root)
+        @specified_root = root
+        @warning_given = false
+        super
+      end
+      def find(*args)
+        found = super
+        if found && !@warning_given
+          @warning_given = true
+          Sass::Util.sass_warn deprecation_warning
+        end
+        found
+      end
+      def directories_to_watch
+        []
+      end
+      def to_s
+        "#{@root} (DEPRECATED)"
+      end
+      protected
+      def deprecation_warning
+        path = @specified_root == "." ? "the current working directory" : @specified_root
+        <<WARNING
+DEPRECATION WARNING: Importing from #{path} will not be
+automatic in future versions of Sass.  To avoid future errors, you can add it
+to your environment explicitly by setting `SASS_PATH=#{@specified_root}`, by using the -I command
+line option, or by changing your Sass configuration options.
+WARNING
+      end
+    end
+  end
+end
+module Sass
   module Shared
     extend self
     def handle_interpolation(str)
@@ -10094,6 +10133,14 @@ module Sass
       options[:load_paths] = (options[:load_paths] + Sass.load_paths).map do |p|
         next p unless p.is_a?(String) || (defined?(Pathname) && p.is_a?(Pathname))
         options[:filesystem_importer].new(p.to_s)
+      end
+      options[:load_paths].reject! do |importer|
+        importer.is_a?(Sass::Importers::DeprecatedPath) &&
+          options[:load_paths].find do |other_importer|
+            other_importer.is_a?(Sass::Importers::Filesystem) &&
+              other_importer != importer &&
+              other_importer.root == importer.root
+          end
       end
       options[:property_syntax] ||= options[:attribute_syntax]
       case options[:property_syntax]
